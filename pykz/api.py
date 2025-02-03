@@ -1,5 +1,7 @@
 """Public API"""
 
+from __future__ import annotations
+
 from .environments.axis import Axis
 from .environments.tikzpicture import TikzPicture
 from .commands.addplot import Addplot
@@ -9,7 +11,7 @@ from .commands.draw import Draw
 from .commands.circle import Circle
 from .plot import create_plot
 import numpy as np
-from typing import Optional
+from typing import Optional, Union
 
 
 class WorkSpace:
@@ -515,7 +517,7 @@ def axvline(x: float, ax: Axis = None, **options) -> list[Addplot]:
     return plot(xes, ys, ax=ax, **options)
 
 
-Point = np.ndarray | str | Node
+Point = Union[np.ndarray, str, Node]
 
 
 def __create_draw(connector_type: str, points: list[Point], **options) -> Draw:

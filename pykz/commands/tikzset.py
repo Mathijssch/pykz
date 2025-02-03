@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from ..command import Command
 from ..style import Style
 from collections import OrderedDict

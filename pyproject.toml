@@ -1,19 +1,47 @@
 [build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+requires = ["flit_core >=3.2,<4"]
+build-backend = "flit_core.buildapi"
 
 [project]
 name = "pykz"
-version = "0.1.3"
 authors = [
     { name="Mathijs Schuurmans", email="mathijs.schuurmans@optia.be" },
 ]
-description = "A Matplotlib-like interface for generating Tikz and Pgfplots figures"
 readme = "README.md"
+license = { "file" = "LICENSE" }
 requires-python = ">=3.7"
 dependencies = [
     "numpy>=1.9"
 ]
+dynamic = ["version", "description"]
+keywords = ["tikz", "plotting", "matplotlib", "pgfplots", "latex"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: GNU General Public License v2 (GPLv2)",
+    "Topic :: Multimedia :: Graphics",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Scientific/Engineering :: Mathematics",
+    "Topic :: Text Processing :: Markup :: LaTeX",
+    "Topic :: Artistic Software",
+    "Topic :: Software Development :: Code Generators",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: MacOS",
+]
+
+[project.urls]
+"Documentation" = "https://mathijssch.github.io/pykz"
+"Source" = "https://github.com/Mathijssch/pykz"
+"Bug Tracker" = "https://github.com/Mathijssch/pykz/issues"
 
 [project.optional-dependencies]
 dev = [

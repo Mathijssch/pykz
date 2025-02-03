@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from ..command import Command
 from .node import Node
 from ..formatting import format_vector

@@ -1,0 +1,119 @@
+name: Python Wheels
+
+on:
+  workflow_dispatch:
+  release:
+    types: ['released', 'prereleased']
+
+env:
+  PACKAGE_VERSION: '0.1.4'
+  PACKAGE_NAME: pykz
+
+jobs:
+  # Build the sdist and wheel distributions
+  build:
+    name: Build package
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install PyPA build
+        run: python -m pip install -U pip build
+
+      - name: Build package
+        run: python -m build -o dist .
+
+      - name: Upload package
+        uses: actions/upload-artifact@v4
+        with:
+          name: wheels
+          path: ./dist/*
+
+  # Testing is done in the official Python Docker container: https://hub.docker.com/_/python/
+  # This should match more closely to the environment that users might use.
+  test:
+    name: Run tests
+    needs: [build]
+    runs-on: ubuntu-latest
+    container:
+      image: python:3.12-bookworm
+      options: --user root  # Needed for apt-get
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install TeX Live
+        run: |
+          apt-get update
+          apt-get install -y texlive-latex-extra
+  
+      - name: Download wheels
+        uses: actions/download-artifact@v4
+        with:
+          name: wheels
+          path: dist
+
+      - name: Install package
+        run: python -m pip install --find-links=dist "${PACKAGE_NAME}[dev]==${PACKAGE_VERSION}"
+
+      - name: Test
+        run: pytest -rP
+
+  # This step checks the package version before release (to make sure that the
+  # package version actually matches the version of the GitHub release tag),
+  # and uses Twine to check the metadata of the packages.
+  check-release:
+    name: Check release
+    if: ${{ github.event.action == 'released' || github.event.action == 'prereleased' }}
+    needs: [test]
+    runs-on: ubuntu-latest
+    container: python:3.12-bullseye
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: wheels
+          path: dist
+
+      - name: Install package
+        run: python -m pip install --no-deps --no-index --find-links=dist ${PACKAGE_NAME}==${PACKAGE_VERSION}
+
+      - name: Check package version
+        run: |
+          version="$(python -c 'from importlib.metadata import version as v; print(v("${{ env.PACKAGE_NAME }}"))')"
+          [ "${{ github.event.release.tag_name }}" = "$version" ]
+        shell: bash
+
+      - name: Twine check
+        run: |
+          python -m pip install twine
+          twine check dist/*
+
+  # Here we download the sdist and the built Wheel files, and upload them to
+  # PyPI. You should follow the trusted publishing instructions in the
+  # https://github.com/pypa/gh-action-pypi-publish README and on
+  # https://docs.pypi.org/trusted-publishers carefully!
+  release:
+    name: Release
+    needs: [check-release]
+    if: ${{ github.event.action == 'released' || github.event.action == 'prereleased' }}
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/${PACKAGE_NAME}
+    permissions:
+      id-token: write  # mandatory for trusted publishing
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: wheels
+          path: dist
+
+      - name: Publish package distributions to PyPI
+        uses: pypa/gh-action-pypi-publish@15c56dba361d8335944d31a2ecd17d700fc7bcbc

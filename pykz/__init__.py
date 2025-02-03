@@ -1,3 +1,9 @@
+"""
+A Matplotlib-like interface for generating Tikz and Pgfplots figures
+"""
+
+__version__ = "0.1.4"
+
 from .api import (
     gcf,
     gca,

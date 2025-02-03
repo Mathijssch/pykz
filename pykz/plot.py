@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import numpy as np
 from .commands.addplot import Addplot, Addplot3d
 from .constants import MAX_NUMBER

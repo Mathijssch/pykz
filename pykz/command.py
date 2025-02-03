@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from .tikzcode import Tex
 from .options import OptionsMixin
 

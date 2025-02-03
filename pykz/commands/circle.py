@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from .draw import Draw
 from .node import Node
 from .connector import Connector

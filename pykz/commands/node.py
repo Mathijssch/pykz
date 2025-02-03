@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from ..command import Command
 from ..label import Label
 from ..tikzcode import Tex
