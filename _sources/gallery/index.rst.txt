@@ -7,11 +7,6 @@ Welcome to the example gallery for pykz.
 
 
 
-
-
-
-
-
 .. raw:: html
 
     <div class="sphx-glr-thumbnails">

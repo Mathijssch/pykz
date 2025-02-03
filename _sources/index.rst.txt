@@ -5,24 +5,24 @@ Pykz, Tikz generation from Python
    :maxdepth: 2
    :caption: Contents:
    :hidden:
-   
+
    api
    gallery/index
 
-Generate beautiful, publication-ready figures with the power of Tikz and 
+Generate beautiful, publication-ready figures with the power of Tikz and
 pgfplots, with a comfortable, familiar Python syntax.
 
-``pykz`` aims to provide a syntax similar to `matplotlib <https://matplotlib.org/>`_, 
+``pykz`` aims to provide a syntax similar to `matplotlib <https://matplotlib.org/>`_,
 but with the possibility of directly outputting (and controlling!)
 your tikz code.
 
 The benefit over alternatives like
-`tikzplotlib <https://github.com/nschloe/tikzplotlib>`_ is ``pykz`` 
+`tikzplotlib <https://github.com/nschloe/tikzplotlib>`_ is ``pykz``
 was designed explicitly with pgfplots in mind, whereas the goal of tikzplotlib
-is to map matplotlib concepts to pgfplots. This is arguably more convenient 
+is to map matplotlib concepts to pgfplots. This is arguably more convenient
 if you already have code for matplotlib, but it often still requires manual
-tweaking to the resulting tex-files. ``pykz`` aims to provide more 
-control over the final output directly in Python, so no manual 
+tweaking to the resulting tex-files. ``pykz`` aims to provide more
+control over the final output directly in Python, so no manual
 tweaking is required afterwards.
 
 Installation
