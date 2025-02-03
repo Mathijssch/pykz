@@ -50,7 +50,7 @@ dev = [
     "pydata-sphinx-theme",
     "myst_parser",
     "sphinx-gallery",
-    "sphinx-codeautolink", 
+    "sphinx-codeautolink",
     "matplotlib",
     "pdf2image"
 ]

@@ -11,7 +11,7 @@ def remove_huge_nbs(arr):
     return arr
 
 
-def create_plot(x: np.ndarray, y: np.ndarray, z: np.ndarray, label: str = None, inline_label: bool = False, **options) -> list[Addplot]:
+def create_plot(x: np.ndarray, y: np.ndarray, z: np.ndarray, label: str | None = None, inline_label: bool = False, **options) -> list[Addplot]:
     plot3d = False
 
     if y is None:  # Plot index vs. x

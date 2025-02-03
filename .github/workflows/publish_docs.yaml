@@ -29,9 +29,9 @@ jobs:
        sudo apt-get install -y texlive-latex-extra
 
     - name: Install Poppler
-      run: | 
+      run: |
         sudo apt-get install -y poppler-utils
-        
+
     - name: Install Python dependencies
       run: |
         python -m pip install --upgrade pip

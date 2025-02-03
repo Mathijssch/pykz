@@ -115,7 +115,7 @@ def ax(**options) -> Axis:
     return ax
 
 
-def dumps(fig: TikzPicture = None) -> str:
+def dumps(fig: TikzPicture | None = None) -> str:
     """
     Dump the tex-code of the current figure to a string.
 
@@ -138,7 +138,7 @@ def dumps(fig: TikzPicture = None) -> str:
     return fig.get_code()
 
 
-def preview(fig: TikzPicture = None):
+def preview(fig: TikzPicture | None = None):
     """
     Preview the current figure.
 
@@ -157,7 +157,7 @@ def preview(fig: TikzPicture = None):
     fig.preview()
 
 
-def save(filename: str, fig: TikzPicture = None, standalone: bool = False):
+def save(filename: str, fig: TikzPicture | None = None, standalone: bool = False):
     """
     Save the generated Tikz code to a file.
 
@@ -192,7 +192,7 @@ def xlabel(lab: str):
     ax.set_xlabel(lab)
 
 
-def xticks(ticks: np.ndarray, labels: list[str] = None, ax: Axis = None):
+def xticks(ticks: np.ndarray, labels: list[str] | None = None, ax: Axis | None = None):
     """
     Set the x ticks and optionally label them.
 
@@ -209,7 +209,7 @@ def xticks(ticks: np.ndarray, labels: list[str] = None, ax: Axis = None):
     ax.set_xticks(ticks, labels)
 
 
-def yticks(ticks: np.ndarray, labels: list[str] = None, ax: Axis = None):
+def yticks(ticks: np.ndarray, labels: list[str] | None = None, ax: Axis | None = None):
     """
     Set the y ticks and optionally label them.
 
@@ -226,7 +226,7 @@ def yticks(ticks: np.ndarray, labels: list[str] = None, ax: Axis = None):
     ax.set_yticks(ticks, labels)
 
 
-def zticks(ticks: np.ndarray, labels: list[str] = None, ax: Axis = None):
+def zticks(ticks: np.ndarray, labels: list[str] | None = None, ax: Axis | None = None):
     """
     Set the z ticks and optionally label them.
 
@@ -243,7 +243,7 @@ def zticks(ticks: np.ndarray, labels: list[str] = None, ax: Axis = None):
     ax.set_zticks(ticks, labels)
 
 
-def define_style(name: str, fig: TikzPicture = None, **options):
+def define_style(name: str, fig: TikzPicture | None = None, **options):
     """
     Define a new style for the figure.
 
@@ -312,7 +312,7 @@ def ylim(limits: tuple[float]):
     ax.set_ylims(limits)
 
 
-def axhline(y: float, ax: Axis = None, **options) -> list[Addplot]:
+def axhline(y: float, ax: Axis | None = None, **options) -> list[Addplot]:
     """
     Plot a horizontal line at the provided y value.
 
@@ -333,7 +333,7 @@ def axhline(y: float, ax: Axis = None, **options) -> list[Addplot]:
     return plot(y, ax, **options)
 
 
-def scale(scale: float, fig: TikzPicture = None):
+def scale(scale: float, fig: TikzPicture | None = None):
     """
     Set the scale of the figure.
 
@@ -348,14 +348,14 @@ def scale(scale: float, fig: TikzPicture = None):
     fig.set_option("scale", scale)
 
 
-def point(coordinates: np.ndarray = None,
+def point(coordinates: np.ndarray | None = None,
           label: str = "",
-          name: str = None,
-          axis_coords: bool = None,
+          name: str | None = None,
+          axis_coords: bool | None = None,
           label_loc: str = "above",
           size: int | str = "1pt",
-          axis: Axis = None,
-          fig: TikzPicture = None,
+          axis: Axis | None = None,
+          fig: TikzPicture | None = None,
           **options) -> Node:
     """
     Draw a point at the given coordinates.
@@ -397,13 +397,13 @@ def point(coordinates: np.ndarray = None,
     return nd
 
 
-def node(coordinates: np.ndarray = None,
-         label: str = None,
-         name: str = None,
-         axis_coords: bool = None,
-         label_loc: str = None,
-         axis: Axis = None,
-         fig: TikzPicture = None,
+def node(coordinates: np.ndarray | None = None,
+         label: str | None = None,
+         name: str | None = None,
+         axis_coords: bool | None = None,
+         label_loc: str | None = None,
+         axis: Axis | None = None,
+         fig: TikzPicture | None = None,
          **options) -> Node:
     """
     Draw a node at the given coordinates.
@@ -492,7 +492,7 @@ def fill_between(x: np.ndarray, y1: np.ndarray, y2: np.ndarray, *,
 # def quiver(x: np.ndarray, y: np.ndarray, dx: np.ndarray, dy: np.ndarray, **options) -> Quiver
 
 
-def axvline(x: float, ax: Axis = None, **options) -> list[Addplot]:
+def axvline(x: float, ax: Axis | None = None, **options) -> list[Addplot]:
     """
     Plot a vertical line at the provided x value.
 
@@ -521,7 +521,7 @@ Point = Union[np.ndarray, str, Node]
 
 
 def __create_draw(connector_type: str, points: list[Point], **options) -> Draw:
-    from pykz.commands import Connector
+    from .commands import Connector
     connector = Connector(connector_type)
     draw = Draw(points, connector, **options)
     return draw
@@ -604,7 +604,7 @@ def line(points: list[Point], connection: str = "--", **options) -> Draw:
 
 
 def arrow(points: list[Point], forward: bool = True, backward: bool = False,
-          arrowhead: str = None, **options) -> Draw:
+          arrowhead: str | None = None, **options) -> Draw:
     """
     Draw an arrow through a list of points.
 
@@ -639,7 +639,7 @@ def arrow(points: list[Point], forward: bool = True, backward: bool = False,
     return line(points, **options)
 
 
-def plot(x, y=None, z=None, ax: Axis = None, label: str | tuple[str] = None,
+def plot(x, y=None, z=None, ax: Axis | None = None, label: str | tuple[str] | None = None,
          inline_label: bool = False,
          **options) -> list[Addplot]:
     """
@@ -675,7 +675,7 @@ def plot(x, y=None, z=None, ax: Axis = None, label: str | tuple[str] = None,
     return plot_commands
 
 
-def scatter(x, y=None, z=None, ax: Axis = None, label: str | tuple[str] = None,
+def scatter(x, y=None, z=None, ax: Axis | None = None, label: str | tuple[str] | None = None,
             inline_label: bool = False,
             **options) -> list[Addplot]:
     """

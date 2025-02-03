@@ -52,7 +52,7 @@ jobs:
         run: |
           apt-get update
           apt-get install -y texlive-latex-extra
-  
+
       - name: Download wheels
         uses: actions/download-artifact@v4
         with:

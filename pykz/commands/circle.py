@@ -17,7 +17,7 @@ class Circle(Draw):
 
     # Override how points work
     @property
-    def points(self) -> list[np.ndarray, str]:
+    def points(self) -> list[np.ndarray | str]:
         return [self.center, str(self.radius)]
 
     @points.setter

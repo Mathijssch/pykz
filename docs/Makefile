@@ -23,4 +23,3 @@ clean:
 	rm -rf $(BUILDDIR)/*
 	rm -rf source/gallery
 	find . -type f -name "../examples/*.pdf" -delete
-

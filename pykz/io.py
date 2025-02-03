@@ -1,6 +1,10 @@
 """Reading and writing to files.
 """
+
+from __future__ import annotations
+
 import os
+from typing import Any
 
 
 def __export_to_tempfile(code: str) -> str:
@@ -59,11 +63,11 @@ def export_pdf_from_file(path: str) -> str:
         If the given document could not be compiled by pdflatex.
     """
     import subprocess
-    from pykz.exceptions import PDFlatexNotFoundError, CompilationError
+    from .exceptions import PDFlatexNotFoundError, CompilationError
     import os
     working_dir = os.path.dirname(path)
 
-    options = dict(capture_output=True, check=True)
+    options: dict[str, Any] = dict(capture_output=True, check=True)
     if working_dir:
         options["cwd"] = working_dir
 

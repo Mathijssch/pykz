@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from .. import formatting
 from ..tikzcode import TikzCode
 from ..commands.tikzset import Tikzset
@@ -29,7 +31,7 @@ class TikzPicture(env.Environment):
         DeprecationWarning("`define_style` is deprecated. Use `set_style` instead.")
         self.set_style(name, **options)
 
-    def add_axis(self, axis: ax.Axis = None):
+    def add_axis(self, axis: ax.Axis | None = None):
         axis = ax.Axis() if axis is None else axis
         self.add(axis)
         self.preamble.usepackage("pgfplots")
@@ -80,7 +82,7 @@ class TikzPicture(env.Environment):
             f.write(self.get_code())
 
     def preview(self):
-        from pykz.io import preview_latex_doc
+        from ..io import preview_latex_doc
         is_standalone = self.standalone
         self.standalone = True
         prev = preview_latex_doc(self.get_code())

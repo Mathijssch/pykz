@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from ..command import Command
 from ..options import Options
 from ..formatting import format_plot_command
@@ -40,7 +42,7 @@ class __AddplotBase(Command):
 class Addplot(__AddplotBase):
 
     def __init__(self, data: np.ndarray,
-                 label: str = None,
+                 label: str | None = None,
                  inline_label: bool = False,
                  **options,
                  ):
@@ -50,7 +52,7 @@ class Addplot(__AddplotBase):
 class Addplot3d(__AddplotBase):
 
     def __init__(self, data: np.ndarray,
-                 label: str = None,
+                 label: str | None = None,
                  inline_label: bool = False,
                  **options,
                  ):

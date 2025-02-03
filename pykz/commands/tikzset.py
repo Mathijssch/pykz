@@ -8,7 +8,7 @@ from collections import OrderedDict
 class Tikzset(Command):
 
     def __init__(self,
-                 styles: list[Style] = None,
+                 styles: list[Style] | None = None,
                  ):
         self._style_map = OrderedDict()
         if styles:

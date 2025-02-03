@@ -12,9 +12,9 @@ class Node(Command):
 
     def __init__(self,
                  label: str = "",
-                 name: str = None,
-                 position: np.ndarray | Tex | str = None,
-                 label_loc: str = None,
+                 name: str | None = None,
+                 position: np.ndarray | Tex | str | None = None,
+                 label_loc: str | None = None,
                  axis_coords: bool = False,
                  **options,
                  ):
@@ -37,7 +37,7 @@ class Node(Command):
     def set_label_loc(self, loc: str):
         self.label.set_location(loc)
 
-    def set_position(self, position: str | Tex | np.ndarray):
+    def set_position(self, position: str | Tex | np.ndarray | None):
         if isinstance(position, str):
             position = Tex(position)
         if not isinstance(position, Tex) and \

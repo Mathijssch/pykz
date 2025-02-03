@@ -90,7 +90,7 @@ def format_plot_command(
         suffix: str = "",
         plot3d: bool = False,
         plotplus: bool = False,
-        label: "Label" = None,
+        label: "Label" | None = None,
         inline_label: bool = False,
         labelopts: str = "") -> str:
     """Return a plot command to plot the given data in pgfplots.

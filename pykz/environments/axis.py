@@ -36,36 +36,36 @@ class Grid(Enum):
 class Axis(Environment):
 
     def __init__(self,
-                 xlabel: str = None,
-                 ylabel: str = None,
-                 view: View = None,
-                 width: str = None,
-                 height: str = None,
+                 xlabel: str | None = None,
+                 ylabel: str | None = None,
+                 view: View | None = None,
+                 width: str | None = None,
+                 height: str | None = None,
                  scale_only_axis: bool = False,
-                 axis_x_line: str = None,
-                 axis_y_line: str = None,
-                 axis_z_line: str = None,
-                 xmode: AxisMode = None,
-                 ymode: AxisMode = None,
-                 zmode: AxisMode = None,
-                 x_dir: AxisDir = None,
-                 y_dir: AxisDir = None,
-                 z_dir: AxisDir = None,
+                 axis_x_line: str | None = None,
+                 axis_y_line: str | None = None,
+                 axis_z_line: str | None = None,
+                 xmode: AxisMode | None = None,
+                 ymode: AxisMode | None = None,
+                 zmode: AxisMode | None = None,
+                 x_dir: AxisDir | None = None,
+                 y_dir: AxisDir | None = None,
+                 z_dir: AxisDir | None = None,
                  axis_equal: bool = False,
                  axis_equal_image: bool = False,
-                 xmin: float = None, xmax: float = None,
-                 ymin: float = None, ymax: float = None,
-                 zmin: float = None, zmax: float = None,
-                 grid: Grid = None,
-                 xminorgrids: bool = None,
-                 yminorgrids: bool = None,
-                 zminorgrids: bool = None,
-                 xmajorgrids: bool = None,
-                 ymajorgrids: bool = None,
-                 zmajorgrids: bool = None,
-                 xtick: str = None,
-                 ytick: str = None,
-                 ztick: str = None,
+                 xmin: float | None = None, xmax: float | None = None,
+                 ymin: float | None = None, ymax: float | None = None,
+                 zmin: float | None = None, zmax: float | None = None,
+                 grid: Grid | None = None,
+                 xminorgrids: bool | None = None,
+                 yminorgrids: bool | None = None,
+                 zminorgrids: bool | None = None,
+                 xmajorgrids: bool | None = None,
+                 ymajorgrids: bool | None = None,
+                 zmajorgrids: bool | None = None,
+                 xtick: str | None = None,
+                 ytick: str | None = None,
+                 ztick: str | None = None,
                  **extra
                  ):
         arguments = locals()
@@ -80,7 +80,7 @@ class Axis(Environment):
     def set_xlabel(self, label: str):
         self.set_option("xlabel", label)
 
-    def enlarge_limits(self, amount: float = 0.05, direction: str = None):
+    def enlarge_limits(self, amount: float = 0.05, direction: str | None = None):
         """Enlarge the range of axes (only x or y if `direction` is provided).
 
         Adds the `enlarge x limits` option.
@@ -158,18 +158,18 @@ class Axis(Environment):
     def boxed(self):
         self.set_option("axis lines", "box")
 
-    def _set_ticks(self, values: tuple[float], labels: tuple[str], direction: str):
+    def _set_ticks(self, values: tuple[float], labels: tuple[str] | None, direction: str):
         self.set_option(f"{direction}tick", f"{{{format_list(values)}}}")
         if labels is not None:
             self.set_option(f"{direction}ticklabels", f"{{{format_list(labels)}}}")
 
-    def set_yticks(self, values: tuple[float], labels: tuple[str] = None):
+    def set_yticks(self, values: tuple[float], labels: tuple[str] | None = None):
         self._set_ticks(values, labels, "y")
 
-    def set_xticks(self, values: tuple[float], labels: tuple[str] = None):
+    def set_xticks(self, values: tuple[float], labels: tuple[str] | None = None):
         self._set_ticks(values, labels, "x")
 
-    def set_zticks(self, values: tuple[float], labels: tuple[str] = None):
+    def set_zticks(self, values: tuple[float], labels: tuple[str] | None = None):
         self._set_ticks(values, labels, "z")
 
     def set_xmax(self, v):

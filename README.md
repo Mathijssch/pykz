@@ -47,9 +47,9 @@ pykz.preview()
 <img src="https://mathijssch.github.io/pykz/_images/sphx_glr_basic_inline_001.png" alt="Sample output" width="60%">
 </div>
 
-### Using Tikz primitives 
+### Using Tikz primitives
 
-Alternatively, you can use standard TikZ 
+Alternatively, you can use standard TikZ
 drawing primitives, without using pfgplots.
 Options passed to the TikZ command are passed as keyword arguments.
 
@@ -67,7 +67,7 @@ print(pykz.dumps())
 # Save the Tikz code to a temporary file, compile it, and open the pdf in the default viewer.
 pykz.preview()
 ```
-out: 
+out:
 ```tex
 \documentclass[tikz]{standalone}
 

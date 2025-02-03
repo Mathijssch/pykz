@@ -68,6 +68,7 @@ class TikzCode:
         if isinstance(line, str):
             line = Tex(line)
         self.lines.append(line)
+        return self
 
     def get_code(self) -> str:
         return "\n".join(line.get_code() for line in self.lines) + "\n"
