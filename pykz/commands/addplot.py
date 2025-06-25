@@ -20,7 +20,7 @@ class __AddplotBase(Command):
         self._plot3d = plot3d
         self._inline_label = inline_label
         self._label_opts = Options(pos=0.7, above=True)
-        self._table_opts = Options(row_sep="\\")
+        self._table_opts = Options(row_sep=r"\\")
         super().__init__("addplot", **options)
 
     def customize_label(self, **options):
@@ -37,7 +37,7 @@ class __AddplotBase(Command):
             labelopts=self._label_opts.format(),
             plotplus=False,
             table_opts=self._table_opts.format(),
-            row_sep=self._table_opts.get("row_sep", ""),
+            row_sep=self._table_opts.get("row sep", ""),
         )
 
 

@@ -104,7 +104,7 @@ def format_plot_command(
         else:
             labelcmd = f"\\addlegendentry{{{label}}}"
     tablecmd = (
-        f"table[{table_opts}]" if (data is not None) and (np.ndim(data) >= 1) else ""
+        f"table{table_opts}" if (data is not None) and (np.ndim(data) >= 1) else ""
     )
     return f"""
 \\addplot{"3" if plot3d else ""}{"+" if plotplus else ""}{raw_options}

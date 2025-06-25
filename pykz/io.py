@@ -95,7 +95,7 @@ def export_pdf_from_file(path: Pathlike) -> Path:
         raise CompilationError(error_message)
     import os
 
-    basename = path.basename
+    basename = path.name
     for ext in {".aux", ".log"}:
         try:
             os.remove(basename + ext)
