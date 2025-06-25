@@ -2,7 +2,7 @@
 A Matplotlib-like interface for generating Tikz and Pgfplots figures
 """
 
-__version__ = "0.2.0"
+__version__ = "0.2.1"
 
 from .api import (
     gcf,
