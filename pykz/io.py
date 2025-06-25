@@ -1,10 +1,12 @@
-"""Reading and writing to files.
-"""
+"""Reading and writing to files."""
 
 from __future__ import annotations
 
 import os
 from typing import Any
+from pathlib import Path
+
+Pathlike = str | Path
 
 
 def __export_to_tempfile(code: str) -> str:
@@ -18,7 +20,7 @@ def __export_to_tempfile(code: str) -> str:
     return f.name
 
 
-def export_pdf_from_code(code: str) -> str:
+def export_pdf_from_code(code: str) -> Path:
     """
     Compile the given ``tex`` code to a pdf file.
 
@@ -38,7 +40,7 @@ def export_pdf_from_code(code: str) -> str:
     return export_pdf_from_file(file)
 
 
-def export_pdf_from_file(path: str) -> str:
+def export_pdf_from_file(path: Pathlike) -> Path:
     """
     Compile the ``tex`` code at the given path.
 
@@ -52,7 +54,7 @@ def export_pdf_from_file(path: str) -> str:
 
     Returns
     -------
-    str
+    Path
         The path to the generated pdf file.
 
     Raises
@@ -64,8 +66,9 @@ def export_pdf_from_file(path: str) -> str:
     """
     import subprocess
     from .exceptions import PDFlatexNotFoundError, CompilationError
-    import os
-    working_dir = os.path.dirname(path)
+
+    path = Path(path)
+    working_dir = path.parent
 
     options: dict[str, Any] = dict(capture_output=True, check=True)
     if working_dir:
@@ -73,27 +76,35 @@ def export_pdf_from_file(path: str) -> str:
 
     try:
         import shutil
-        pdflatex_path = shutil.which('pdflatex')
-        if pdflatex_path is None:
-            raise PDFlatexNotFoundError(f"Could not find executable `pdflatex` to compile {path}. Please make sure it is installed and accessible in the system's path.")
 
-        subprocess.run([pdflatex_path, "-interaction=nonstopmode", "-halt-on-error", path], **options)
+        pdflatex_path = shutil.which("pdflatex")
+        if pdflatex_path is None:
+            raise PDFlatexNotFoundError(
+                f"Could not find executable `pdflatex` to compile {path}. Please make sure it is installed and accessible in the system's path."
+            )
+
+        subprocess.run(
+            [pdflatex_path, "-interaction=nonstopmode", "-halt-on-error", path],
+            **options,
+        )
         # print("Pdflatex done!")
     except subprocess.CalledProcessError as e:
-        error_message = f"{e.stdout.decode('UTF-8')}\n\nCompilation failed with the error above ☝️ "
+        error_message = (
+            f"{e.stdout.decode('UTF-8')}\n\nCompilation failed with the error above ☝️ "
+        )
         raise CompilationError(error_message)
     import os
 
-    basename = os.path.splitext(path)[0]
+    basename = path.basename
     for ext in {".aux", ".log"}:
         try:
             os.remove(basename + ext)
         except FileNotFoundError:
             ...
-    return f"{basename}.pdf"
+    return Path(f"{basename}.pdf")
 
 
-def export_png_from_file(input_file: str, **options) -> str:
+def export_png_from_file(input_file: Pathlike, **options) -> Path:
     """
     Export the given tex file to a png image.
 
@@ -107,10 +118,11 @@ def export_png_from_file(input_file: str, **options) -> str:
 
     Returns
     -------
-    str
+    Path
         The path to the generated png file.
     """
     import pdf2image
+
     pdf_file = export_pdf_from_file(input_file)
     path = pdf_file.replace(".pdf", ".png")
     options["output_file"] = path
@@ -135,9 +147,15 @@ def export_png_from_code(code: str, path: str, **options):
     str
         The path to the generated png file.
     """
-    import pdf2image
+    try:
+        import pdf2image
+    except ImportError:
+        raise RuntimeError(
+            "Exporting to png relies on the dependency pdf2image. Install it using `pip install pdf2image`, or install pykz using `pip install pykz[png]`"
+        )
+
     pdf_file = export_pdf_from_code(code)
-    options["output_file"] = path
+    options["output_file"] = str(path)
     pdf2image.convert_from_path(pdf_file, **options)
 
 
@@ -152,15 +170,17 @@ def open_pdf_file(file_path: str):
     """
     import sys
     import subprocess
+
     print("Opening pdf file")
 
-    if sys.platform.startswith('darwin'):  # macOS
-        result = subprocess.run(['open', file_path], capture_output=True, text=True)
-    elif sys.platform.startswith('win32'):  # Windows
+    if sys.platform.startswith("darwin"):  # macOS
+        result = subprocess.run(["open", file_path], capture_output=True, text=True)
+    elif sys.platform.startswith("win32"):  # Windows
         import os
+
         result = os.startfile(file_path)
-    elif sys.platform.startswith('linux'):  # Linux
-        result = subprocess.run(['xdg-open', file_path], capture_output=True, text=True)
+    elif sys.platform.startswith("linux"):  # Linux
+        result = subprocess.run(["xdg-open", file_path], capture_output=True, text=True)
     else:
         print("Unsupported platform. Unable to open PDF file.")
     input("Press any key to continue.")
@@ -199,7 +219,6 @@ def preview_latex_doc(code: str) -> str:
 
 
 if __name__ == "__main__":
-
     TEX_STRING = r"""
     \documentclass{article}
     \begin{document}

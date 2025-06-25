@@ -5,7 +5,7 @@ build-backend = "flit_core.buildapi"
 [project]
 name = "pykz"
 authors = [
-    { name="Mathijs Schuurmans", email="mathijs.schuurmans@optia.be" },
+  { name = "Mathijs Schuurmans", email = "mathijs.schuurmans@optia.be" },
 ]
 readme = "README.md"
 license = { "file" = "LICENSE" }
@@ -54,3 +54,4 @@ dev = [
     "matplotlib",
     "pdf2image"
 ]
+png = ["pdf2image"]

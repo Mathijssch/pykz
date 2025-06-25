@@ -25,7 +25,7 @@ def format_options(replace_underscores=True, with_brackets=True, **options) -> s
             opts.append(f"{name}={value}")
 
     if opts:
-        options_str = ',\n'.join(opts)
+        options_str = ",\n".join(opts)
         return f"[{options_str}]" if with_brackets else options_str
     return ""
 
@@ -50,9 +50,7 @@ def wrap_env(envname: str, wrapped: str, **options) -> str:
     return f"\\begin{{{envname}}}{format_options(**options)}\n{wrapped}\n\\end{{{envname}}}"
 
 
-def format_vector(vector: np.ndarray,
-                  separator: str = " ",
-                  ints: bool = False) -> str:
+def format_vector(vector: np.ndarray, separator: str = " ", ints: bool = False) -> str:
     """Format a vector as a string by joining it with the provided separator."""
     if ints:
         formatted = [f"{int(element):d}" for element in vector]
@@ -61,7 +59,7 @@ def format_vector(vector: np.ndarray,
     return separator.join(formatted)
 
 
-def format_matrix(matrix: np.ndarray) -> str:
+def format_matrix(matrix: np.ndarray, row_sep: str = "") -> str:
     """Format a matrix for use in an \\addplot command.
 
     Args:
@@ -79,33 +77,39 @@ def format_matrix(matrix: np.ndarray) -> str:
     if np.ndim(matrix) == 1:
         return format_vector(matrix)
     elif np.ndim(matrix) == 2:
-        return '\n'.join([format_vector(row) for row in matrix])
+        return "\n".join([format_vector(row) + row_sep for row in matrix])
     else:
-        raise ValueError(f"Formatting {np.ndim(matrix)}-dimensional data is not supported.")
+        raise ValueError(
+            f"Formatting {np.ndim(matrix)}-dimensional data is not supported."
+        )
 
 
 def format_plot_command(
-        data: np.ndarray,
-        raw_options: str = "",
-        suffix: str = "",
-        plot3d: bool = False,
-        plotplus: bool = False,
-        label: "Label" | None = None,
-        inline_label: bool = False,
-        labelopts: str = "") -> str:
-    """Return a plot command to plot the given data in pgfplots.
-    """
+    data: np.ndarray,
+    raw_options: str = "",
+    suffix: str = "",
+    plot3d: bool = False,
+    plotplus: bool = False,
+    label: "Label" | None = None,
+    inline_label: bool = False,
+    labelopts: str = "",
+    table_opts: str = "",
+    row_sep: str = "",
+) -> str:
+    """Return a plot command to plot the given data in pgfplots."""
     labelcmd = ""
     if label:
         if inline_label:
             suffix += f"node{labelopts} {{{label}}}"
         else:
             labelcmd = f"\\addlegendentry{{{label}}}"
-    tablecmd = "table" if (data is not None) and (np.ndim(data) >= 1) else ""
+    tablecmd = (
+        f"table[{table_opts}]" if (data is not None) and (np.ndim(data) >= 1) else ""
+    )
     return f"""
-\\addplot{'3' if plot3d else ''}{'+' if plotplus else ''}{raw_options}
+\\addplot{"3" if plot3d else ""}{"+" if plotplus else ""}{raw_options}
 {tablecmd}{{%
-{format_matrix(data)}
+{format_matrix(data, row_sep=row_sep)}
 }}{suffix};
 {labelcmd}
 """

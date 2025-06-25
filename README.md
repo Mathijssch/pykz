@@ -67,7 +67,7 @@ print(pykz.dumps())
 # Save the Tikz code to a temporary file, compile it, and open the pdf in the default viewer.
 pykz.preview()
 ```
-out:
+out: 
 ```tex
 \documentclass[tikz]{standalone}
 
