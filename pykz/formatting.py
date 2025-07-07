@@ -22,7 +22,7 @@ def format_options(replace_underscores=True, with_brackets=True, **options) -> s
         else:
             if replace_underscores:
                 name = name.replace("_", " ")
-            opts.append(f"{name}={value}")
+            opts.append(f"{name}={{{value}}}")
 
     if opts:
         options_str = ",\n".join(opts)
