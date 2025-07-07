@@ -3,8 +3,14 @@
 from __future__ import annotations
 
 import os
-from typing import Any
+from typing import Any, Type
 from pathlib import Path
+from .exceptions import (
+    PDFlatexNotFoundError,
+    CompilationError,
+    OpenPdfException,
+    WrapperError,
+)
 
 Pathlike = str | Path
 
@@ -74,7 +80,6 @@ def export_pdf_from_file(path: Pathlike) -> Path:
     if working_dir:
         options["cwd"] = working_dir
 
-    try:
         import shutil
 
         pdflatex_path = shutil.which("pdflatex")
@@ -83,16 +88,10 @@ def export_pdf_from_file(path: Pathlike) -> Path:
                 f"Could not find executable `pdflatex` to compile {path}. Please make sure it is installed and accessible in the system's path."
             )
 
-        subprocess.run(
+        _subprocess(
             [pdflatex_path, "-interaction=nonstopmode", "-halt-on-error", path],
-            **options,
+            CompilationError,
         )
-        # print("Pdflatex done!")
-    except subprocess.CalledProcessError as e:
-        error_message = (
-            f"{e.stdout.decode('UTF-8')}\n\nCompilation failed with the error above ☝️ "
-        )
-        raise CompilationError(error_message)
     import os
 
     basename = path.name
@@ -159,6 +158,18 @@ def export_png_from_code(code: str, path: str, **options):
     pdf2image.convert_from_path(pdf_file, **options)
 
 
+def _subprocess(cmds: list[str], exception_cls: Type[WrapperError], **options):
+    import subprocess
+
+    default_options: dict[str, Any] = dict(capture_output=True, check=True)
+    default_options.update(options)
+    try:
+        result = subprocess.run(cmds, **options)
+    except subprocess.CalledProcessError as e:
+        raise exception_cls(e)
+    return result
+
+
 def open_pdf_file(file_path: str):
     """
     Open the pdf file at the given path in the system default pdf reader.
@@ -169,23 +180,20 @@ def open_pdf_file(file_path: str):
         Path to the pdf file to open.
     """
     import sys
-    import subprocess
 
-    print("Opening pdf file")
+    print(f"Opening pdf file {file_path} ...")
 
     if sys.platform.startswith("darwin"):  # macOS
-        result = subprocess.run(["open", file_path], capture_output=True, text=True)
+        _subprocess(["open", file_path], OpenPdfException)
     elif sys.platform.startswith("win32"):  # Windows
         import os
 
-        result = os.startfile(file_path)
+        os.startfile(file_path)
     elif sys.platform.startswith("linux"):  # Linux
-        result = subprocess.run(["xdg-open", file_path], capture_output=True, text=True)
+        _subprocess(["xdg-open", file_path], OpenPdfException)
     else:
         print("Unsupported platform. Unable to open PDF file.")
     input("Press any key to continue.")
-    if result.returncode != 0:
-        print(sys.stdout)
 
 
 def preview_latex_doc(code: str) -> str:
@@ -213,7 +221,7 @@ def preview_latex_doc(code: str) -> str:
     except Exception as e:
         try:
             os.remove(pdf_path)
-        except FileNotFoundError():
+        except FileNotFoundError:
             ...
         raise e
 
