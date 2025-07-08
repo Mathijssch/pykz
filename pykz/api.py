@@ -243,6 +243,40 @@ def zticks(ticks: np.ndarray, labels: list[str] | None = None, ax: Axis | None =
     ax.set_zticks(ticks, labels)
 
 
+def usepackage(package_name: str, fig: TikzPicture | None = None, **options):
+    """
+    Add a usepackage statement to the current or given figure.
+
+    Parameters
+    ----------
+    name : str
+        Name of the style to define
+    fig : TikzPicture, optional
+        Figure to include the package in. If None, uses current figure.
+    **options
+        Style options to set
+    """
+    fig = __get_or_create_fig() if fig is None else fig
+    fig.usepackage(package_name, **options)
+
+
+def usepgfplotslibrary(library_name: str, fig: TikzPicture | None = None, **options):
+    """
+    Add a usepgfplotslibrary-statement to the current or given figure.
+
+    Parameters
+    ----------
+    name : str
+        Name of the style to define
+    fig : TikzPicture, optional
+        Figure to include the package in. If None, uses current figure.
+    **options
+        Style options to set
+    """
+    fig = __get_or_create_fig() if fig is None else fig
+    fig.usepgfplotslibrary(library_name, **options)
+
+
 def define_style(name: str, fig: TikzPicture | None = None, **options):
     """
     Define a new style for the figure.
@@ -348,15 +382,17 @@ def scale(scale: float, fig: TikzPicture | None = None):
     fig.set_option("scale", scale)
 
 
-def point(coordinates: np.ndarray | None = None,
-          label: str = "",
-          name: str | None = None,
-          axis_coords: bool | None = None,
-          label_loc: str = "above",
-          size: int | str = "1pt",
-          axis: Axis | None = None,
-          fig: TikzPicture | None = None,
-          **options) -> Node:
+def point(
+    coordinates: np.ndarray | None = None,
+    label: str = "",
+    name: str | None = None,
+    axis_coords: bool | None = None,
+    label_loc: str = "above",
+    size: int | str = "1pt",
+    axis: Axis | None = None,
+    fig: TikzPicture | None = None,
+    **options,
+) -> Node:
     """
     Draw a point at the given coordinates.
 
@@ -397,14 +433,16 @@ def point(coordinates: np.ndarray | None = None,
     return nd
 
 
-def node(coordinates: np.ndarray | None = None,
-         label: str | None = None,
-         name: str | None = None,
-         axis_coords: bool | None = None,
-         label_loc: str | None = None,
-         axis: Axis | None = None,
-         fig: TikzPicture | None = None,
-         **options) -> Node:
+def node(
+    coordinates: np.ndarray | None = None,
+    label: str | None = None,
+    name: str | None = None,
+    axis_coords: bool | None = None,
+    label_loc: str | None = None,
+    axis: Axis | None = None,
+    fig: TikzPicture | None = None,
+    **options,
+) -> Node:
     """
     Draw a node at the given coordinates.
 
@@ -449,8 +487,14 @@ def node(coordinates: np.ndarray | None = None,
     return node
 
 
-def fill_between(x: np.ndarray, y1: np.ndarray, y2: np.ndarray, *,
-                 draw_options=None, fill_options=None) -> FillBetween:
+def fill_between(
+    x: np.ndarray,
+    y1: np.ndarray,
+    y2: np.ndarray,
+    *,
+    draw_options=None,
+    fill_options=None,
+) -> FillBetween:
     """
     Fill the area between two curves.
 
@@ -509,7 +553,7 @@ def axvline(x: float, ax: Axis | None = None, **options) -> list[Addplot]:
     -------
     list[Addplot]
         List of plot commands created
-    """    # TODO: Think of ways to represent this allow axes dimensions to be updated afterwards.
+    """  # TODO: Think of ways to represent this allow axes dimensions to be updated afterwards.
     ax = ax if ax is not None else __get_or_create_ax()
     ymin, ymax = ax.get_ylims()
     xes = np.array((x, x))
@@ -522,6 +566,7 @@ Point = Union[np.ndarray, str, Node]
 
 def __create_draw(connector_type: str, points: list[Point], **options) -> Draw:
     from .commands import Connector
+
     connector = Connector(connector_type)
     draw = Draw(points, connector, **options)
     return draw
@@ -534,7 +579,6 @@ def __add_draw_command(draw: Draw) -> Draw:
 
 
 def __create_and_add_draw(connector_type: str, points: list[Point], **options):
-
     draw = __create_draw(connector_type, points, **options)
     return __add_draw_command(draw)
 
@@ -603,8 +647,13 @@ def line(points: list[Point], connection: str = "--", **options) -> Draw:
     return __create_and_add_draw(connection, points, **options)
 
 
-def arrow(points: list[Point], forward: bool = True, backward: bool = False,
-          arrowhead: str | None = None, **options) -> Draw:
+def arrow(
+    points: list[Point],
+    forward: bool = True,
+    backward: bool = False,
+    arrowhead: str | None = None,
+    **options,
+) -> Draw:
     """
     Draw an arrow through a list of points.
 
@@ -639,9 +688,15 @@ def arrow(points: list[Point], forward: bool = True, backward: bool = False,
     return line(points, **options)
 
 
-def plot(x, y=None, z=None, ax: Axis | None = None, label: str | tuple[str] | None = None,
-         inline_label: bool = False,
-         **options) -> list[Addplot]:
+def plot(
+    x,
+    y=None,
+    z=None,
+    ax: Axis | None = None,
+    label: str | tuple[str] | None = None,
+    inline_label: bool = False,
+    **options,
+) -> list[Addplot]:
     """
     Create a plot command.
 
@@ -675,9 +730,15 @@ def plot(x, y=None, z=None, ax: Axis | None = None, label: str | tuple[str] | No
     return plot_commands
 
 
-def scatter(x, y=None, z=None, ax: Axis | None = None, label: str | tuple[str] | None = None,
-            inline_label: bool = False,
-            **options) -> list[Addplot]:
+def scatter(
+    x,
+    y=None,
+    z=None,
+    ax: Axis | None = None,
+    label: str | tuple[str] | None = None,
+    inline_label: bool = False,
+    **options,
+) -> list[Addplot]:
     """
     Create a scatter plot command.
 

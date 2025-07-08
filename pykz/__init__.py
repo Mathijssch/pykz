@@ -17,6 +17,8 @@ from .api import (
     yticks,
     zticks,
     define_style,
+    usepackage,
+    usepgfplotslibrary,
     ylabel,
     zlabel,
     xlim,
