@@ -277,6 +277,23 @@ def usepgfplotslibrary(library_name: str, fig: TikzPicture | None = None, **opti
     fig.usepgfplotslibrary(library_name, **options)
 
 
+def usetikzlibrary(library_name: str, fig: TikzPicture | None = None, **options):
+    """
+    Add a usetikzlibrary-statement to the current or given figure.
+
+    Parameters
+    ----------
+    name : str
+        Name of the style to define
+    fig : TikzPicture, optional
+        Figure to include the package in. If None, uses current figure.
+    **options
+        Style options to set
+    """
+    fig = __get_or_create_fig() if fig is None else fig
+    fig.usetikzlibrary(library_name, **options)
+
+
 def define_style(name: str, fig: TikzPicture | None = None, **options):
     """
     Define a new style for the figure.

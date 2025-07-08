@@ -19,6 +19,7 @@ from .api import (
     define_style,
     usepackage,
     usepgfplotslibrary,
+    usetikzlibrary,
     ylabel,
     zlabel,
     xlim,
@@ -76,4 +77,7 @@ __all__ = [
     "AxisDir",
     "View",
     "io",
+    "usepackage",
+    "usepgfplotslibrary",
+    "usetikzlibrary",
 ]
