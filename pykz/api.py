@@ -266,8 +266,8 @@ def usepgfplotslibrary(library_name: str, fig: TikzPicture | None = None, **opti
 
     Parameters
     ----------
-    name : str
-        Name of the style to define
+    library_name : str
+        Name of the library to import
     fig : TikzPicture, optional
         Figure to include the package in. If None, uses current figure.
     **options
@@ -283,15 +283,34 @@ def usetikzlibrary(library_name: str, fig: TikzPicture | None = None, **options)
 
     Parameters
     ----------
-    name : str
-        Name of the style to define
+    library_name : str
+        Name of the library to import
     fig : TikzPicture, optional
         Figure to include the package in. If None, uses current figure.
     **options
         Style options to set
     """
     fig = __get_or_create_fig() if fig is None else fig
-    fig.usetikzlibrary(library_name, **options)
+    fig.preamble.usetikzlibrary(library_name, **options)
+
+
+def newcommand(
+    name: str, implementation: str, n_args: int = 0, fig: TikzPicture | None = None
+):
+    """
+    Define a new command for the figure.
+
+    Parameters
+    ----------
+    name : str
+        Name of the command to define
+    implementation: str
+        String to use as the implementation of the new command
+    fig : TikzPicture, optional
+        Figure to define the style for. If None, uses current figure.
+    """
+    fig = __get_or_create_fig() if fig is None else fig
+    fig.preamble.newcommand(name, implementation, n_args)
 
 
 def define_style(name: str, fig: TikzPicture | None = None, **options):

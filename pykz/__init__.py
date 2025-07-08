@@ -20,6 +20,7 @@ from .api import (
     usepackage,
     usepgfplotslibrary,
     usetikzlibrary,
+    newcommand,
     ylabel,
     zlabel,
     xlim,
@@ -80,4 +81,5 @@ __all__ = [
     "usepackage",
     "usepgfplotslibrary",
     "usetikzlibrary",
+    "newcommand"
 ]
