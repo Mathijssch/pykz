@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from .tikzcode import TikzCode
 from .environments.axis import Axis
 from .environments.tikzpicture import TikzPicture
 from .commands.addplot import Addplot
@@ -9,6 +10,7 @@ from .commands.fillbetween import FillBetween
 from .commands.node import Node
 from .commands.draw import Draw
 from .commands.circle import Circle
+from .calc import Calc
 from .plot import create_plot
 import numpy as np
 from typing import Optional, Union
@@ -330,6 +332,12 @@ def define_style(name: str, fig: TikzPicture | None = None, **options):
     fig.set_style(name, **options)
 
 
+def calc(pt: str, offset: tuple[float] | str, fig: TikzPicture | None = None) -> Calc:
+    usetikzlibrary("calc", fig)
+    calc = Calc(pt, offset)
+    return calc
+
+
 def ylabel(lab: str):
     """
     Set the y label of the current axis.
@@ -471,8 +479,8 @@ def point(
 
 def node(
     coordinates: np.ndarray | None = None,
-    label: str | None = None,
-    name: str | None = None,
+    label: str = "",
+    name: str = "",
     axis_coords: bool | None = None,
     label_loc: str | None = None,
     axis: Axis | None = None,
@@ -802,3 +810,8 @@ def scatter(
     """
     options["only marks"] = True
     return plot(x, y, z, ax, label, inline_label, **options)
+
+
+def preamble(fig: TikzPicture | None = None) -> TikzCode:
+    fig = __get_or_create_fig()
+    return fig.preamble

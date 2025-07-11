@@ -20,6 +20,7 @@ from .api import (
     usepackage,
     usepgfplotslibrary,
     usetikzlibrary,
+    calc,
     newcommand,
     ylabel,
     zlabel,
@@ -38,6 +39,7 @@ from .api import (
     plot,
     scatter,
     point,
+    preamble
 )
 from .environments.axis import Grid, Axis, AxisMode, AxisDir, View
 from . import io
@@ -81,5 +83,7 @@ __all__ = [
     "usepackage",
     "usepgfplotslibrary",
     "usetikzlibrary",
-    "newcommand"
+    "newcommand",
+    "preamble",
+    "calc"
 ]
