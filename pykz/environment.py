@@ -28,3 +28,6 @@ class Environment(Tex, OptionsMixin):
 
     def requires_package(self, package_name: str, **options):
         self.requirements.usepackage(package_name, **options)
+
+    def requires_tikzlibrary(self, library_name: str, **options):
+        self.requirements.usetikzlibrary(library_name, **options)
