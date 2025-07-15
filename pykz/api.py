@@ -812,6 +812,30 @@ def scatter(
     return plot(x, y, z, ax, label, inline_label, **options)
 
 
+def semilogy(ax: Axis | None = None):
+    from .environments.axis import AxisMode
+
+    ax = __get_or_create_ax() if ax is None else ax
+    ax.set_xmode(AxisMode.linear.value)
+    ax.set_ymode(AxisMode.log.value)
+
+
+def semilogx(ax: Axis | None = None):
+    from .environments.axis import AxisMode
+
+    ax = __get_or_create_ax() if ax is None else ax
+    ax.set_xmode(AxisMode.log.value)
+    ax.set_ymode(AxisMode.linear.value)
+
+
+def loglog(ax: Axis | None = None):
+    from .environments.axis import AxisMode
+
+    ax = __get_or_create_ax() if ax is None else ax
+    ax.set_xmode(AxisMode.log.value)
+    ax.set_ymode(AxisMode.log.value)
+
+
 def preamble(fig: TikzPicture | None = None) -> TikzCode:
-    fig = __get_or_create_fig()
+    fig = __get_or_create_fig() if fig is None else fig
     return fig.preamble

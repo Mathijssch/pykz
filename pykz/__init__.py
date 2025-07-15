@@ -22,6 +22,9 @@ from .api import (
     usetikzlibrary,
     calc,
     newcommand,
+    semilogy,
+    semilogx,
+    loglog,
     ylabel,
     zlabel,
     xlim,
@@ -39,7 +42,7 @@ from .api import (
     plot,
     scatter,
     point,
-    preamble
+    preamble,
 )
 from .environments.axis import Grid, Axis, AxisMode, AxisDir, View
 from . import io
@@ -85,5 +88,8 @@ __all__ = [
     "usetikzlibrary",
     "newcommand",
     "preamble",
-    "calc"
+    "calc",
+    "semilogy",
+    "semilogx",
+    "loglog",
 ]
