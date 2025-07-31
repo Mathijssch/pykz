@@ -789,21 +789,30 @@ def surf(
 def contour(
     x, y, z, ax: Axis | None = None, label: str | None = None, **options
 ) -> list[Contour]:
+    from .util import get_extremes_safely
+
     ax = ax if ax is not None else __get_or_create_ax()
-    contours = create_contour(x, y, z, **options)
+    contours, levels = create_contour(x, y, z, **options)
     for contour in contours:
         ax.add(contour)
+    min, max = get_extremes_safely(levels)
+    ax.set_option("point meta min", min)
+    ax.set_option("point_meta_max", max)
     return contours
 
 
 def contourf(
     x, y, z, ax: Axis | None = None, label: str | None = None, **options
 ) -> list[ContourFilled]:
+    from .util import get_extremes_safely
+
     ax = ax if ax is not None else __get_or_create_ax()
-    contours = create_contourf(x, y, z, **options)
+    contours, levels = create_contourf(x, y, z, **options)
     for contour in contours:
         ax.add(contour)
-    usetikzlibrary("fillbetween")
+    min, max = get_extremes_safely(levels)
+    ax.set_option("point meta min", min)
+    ax.set_option("point_meta_max", max)
     return contours
 
 

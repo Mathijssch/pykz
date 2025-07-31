@@ -59,10 +59,9 @@ def _default_levels(z: np.ndarray, n_levels=10):
 
 
 def get_relative_level(level, levels):
-    levels = np.asarray(levels)
-    finite = np.isfinite(levels)
-    lower = np.min(levels[finite])
-    upper = np.max(levels[finite])
+    from .util import get_extremes_safely
+
+    lower, upper = get_extremes_safely(levels)
     return round((level - lower) / (upper - lower) * 1000)
 
 
@@ -82,7 +81,7 @@ def create_contourf(
     contour_tex = []
     for l1, l2 in zip(levels[:-1], levels[1:]):
         points, indices = generator.filled(l1, l2)
-        print(f"shape: {indices[0].shape}")
+        # print(f"shape: {indices[0].shape}")
         relative_level = get_relative_level(l1, levels)
         contour_tex.extend(
             [
@@ -90,7 +89,7 @@ def create_contourf(
                 for pts, indx in zip(points, indices)
             ]
         )
-    return contour_tex
+    return contour_tex, levels
 
 
 def create_contour(
@@ -113,4 +112,4 @@ def create_contour(
         Contour(pts, get_relative_level(level, levels), **pgfplots_options)
         for pts, level in zip(points, levels)
     ]
-    return contour_tex
+    return contour_tex, levels
