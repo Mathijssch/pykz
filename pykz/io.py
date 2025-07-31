@@ -70,8 +70,7 @@ def export_pdf_from_file(path: Pathlike) -> Path:
     CompilationError:
         If the given document could not be compiled by pdflatex.
     """
-    import subprocess
-    from .exceptions import PDFlatexNotFoundError, CompilationError
+    # from .exceptions import PDFlatexNotFoundError, CompilationError
 
     path = Path(path)
     working_dir = path.parent
@@ -97,6 +96,7 @@ def export_pdf_from_file(path: Pathlike) -> Path:
     basename = path.name
     for ext in {".aux", ".log"}:
         try:
+            print(f"Removing {basename + ext}")
             os.remove(basename + ext)
         except FileNotFoundError:
             ...
@@ -220,10 +220,16 @@ def preview_latex_doc(code: str) -> str:
         open_pdf_file(pdf_path)
     except Exception as e:
         try:
+            print(f"Removing {pdf_path}")
             os.remove(pdf_path)
         except FileNotFoundError:
-            ...
+            print(f"Could not remove {pdf_path}. File not found.")
         raise e
+    try:
+        print(f"Removing {pdf_path}")
+        os.remove(pdf_path)
+    except FileNotFoundError:
+        print(f"Could not remove {pdf_path}. File not found.")
 
 
 if __name__ == "__main__":
