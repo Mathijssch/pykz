@@ -58,7 +58,11 @@ def _default_levels(z: np.ndarray, n_levels=10):
     return np.linspace(zmin, zmax, n_levels)
 
 
-def get_relative_level(level, lower, upper):
+def get_relative_level(level, levels):
+    levels = np.asarray(levels)
+    finite = np.isfinite(levels)
+    lower = np.min(levels[finite])
+    upper = np.max(levels[finite])
     return round((level - lower) / (upper - lower) * 1000)
 
 
@@ -75,13 +79,11 @@ def create_contourf(
         options.update(contour_options)
     generator = contourpy.contour_generator(x, y, z, **options)
     levels = _default_levels(z) if levels is None else levels
-    level_min = np.min(levels)
-    level_max = np.max(levels)
     contour_tex = []
     for l1, l2 in zip(levels[:-1], levels[1:]):
         points, indices = generator.filled(l1, l2)
         print(f"shape: {indices[0].shape}")
-        relative_level = get_relative_level(l1, level_min, level_max)
+        relative_level = get_relative_level(l1, levels)
         contour_tex.extend(
             [
                 ContourFilled(pts, indx, relative_level, **pgfplots_options)
@@ -106,13 +108,9 @@ def create_contour(
         x, y, z, line_type=contourpy.LineType.Separate, **options
     )
     levels = _default_levels(z) if levels is None else levels
-    level_min = np.min(levels)
-    level_max = np.max(levels)
     points = generator.multi_lines(levels)
     contour_tex = [
-        Contour(
-            pts, get_relative_level(level, level_min, level_max), **pgfplots_options
-        )
+        Contour(pts, get_relative_level(level, levels), **pgfplots_options)
         for pts, level in zip(points, levels)
     ]
     return contour_tex
