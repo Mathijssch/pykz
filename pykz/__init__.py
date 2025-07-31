@@ -27,6 +27,7 @@ from .api import (
     loglog,
     ylabel,
     zlabel,
+    contour,
     xlim,
     ylim,
     axhline,
@@ -43,6 +44,7 @@ from .api import (
     scatter,
     point,
     preamble,
+    colorbar,
 )
 from .environments.axis import Grid, Axis, AxisMode, AxisDir, View
 from . import io
@@ -92,4 +94,6 @@ __all__ = [
     "semilogy",
     "semilogx",
     "loglog",
+    "contour",
+    "colorbar"
 ]

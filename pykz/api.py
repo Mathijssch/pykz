@@ -11,7 +11,7 @@ from .commands.node import Node
 from .commands.draw import Draw
 from .commands.circle import Circle
 from .calc import Calc
-from .plot import create_plot
+from .plot import create_plot, create_surface_plot
 import numpy as np
 from typing import Optional, Union
 
@@ -774,6 +774,29 @@ def plot(
     for plt in plot_commands:
         ax.add(plt)
     return plot_commands
+
+
+def surf(
+    x, y, z, ax: Axis | None = None, label: str | None = None, **options
+) -> Addplot:
+    ax = ax if ax is not None else __get_or_create_ax()
+    plot = create_surface_plot(x, y, z, label, **options)
+    ax.add(plot)
+    return plot
+
+
+def contour(
+    x, y, z, ax: Axis | None = None, label: str | None = None, **options
+) -> Addplot:
+    ax = ax if ax is not None else __get_or_create_ax()
+    ax.set_option("view", "{0}{90}")
+    options["contour gnuplot"] = True
+    return surf(x, y, z, ax, label, **options)
+
+
+def colorbar(ax: Axis | None = None):
+    ax = ax if ax is not None else __get_or_create_ax()
+    ax.set_option("colorbar", True)
 
 
 def scatter(
