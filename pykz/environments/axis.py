@@ -126,17 +126,25 @@ class Axis(Environment):
     def set_zlabel(self, label: str):
         self.options.set_option("zlabel", label)
 
+    def _set_lims(self, lims, labels):
+        for lim, lab in zip(lims, labels):
+            if lim is not None:
+                self.options[lab] = lim
+
     def set_xlims(self, lims: tuple[float]):
-        (self.options["xmin"], self.options["xmax"]) = lims
+        self._set_lims(lims, ["xmin", "xmax"])
 
     def set_ylims(self, lims: tuple[float]):
-        (self.options["ymin"], self.options["ymax"]) = lims
+        self._set_lims(lims, ["ymin", "ymax"])
 
     def set_zlims(self, lims: tuple[float]):
-        (self.options["zmin"], self.options["zmax"]) = lims
+        self._set_lims(lims, ["zmin", "zmax"])
 
     def get_ylims(self) -> tuple:
         return (self.options.get("ymin", -1), self.options.get("ymax", 1))
+
+    def get_xlims(self) -> tuple:
+        return (self.options.get("xmin", -1), self.options.get("xmax", 1))
 
     def center(self):
         """Center the axis lines"""
