@@ -408,7 +408,9 @@ def axhline(y: float, ax: Axis | None = None, **options) -> list[Addplot]:
     list[Addplot]
         List of plot commands created
     """
-    return plot(y, ax, **options)
+    ax = __get_or_create_ax() if ax is None else ax
+    xlims = ax.get_xlims()
+    return plot(xlims, [y, y], ax=ax, **options)
 
 
 def scale(scale: float, fig: TikzPicture | None = None):
