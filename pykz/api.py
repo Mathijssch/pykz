@@ -12,6 +12,7 @@ from .commands.draw import Draw
 from .commands.circle import Circle
 from .calc import Calc
 from .plot import create_plot, create_surface_plot
+from .contour import create_contour, create_contourf, ContourFilled, Contour
 import numpy as np
 from typing import Optional, Union
 
@@ -787,11 +788,23 @@ def surf(
 
 def contour(
     x, y, z, ax: Axis | None = None, label: str | None = None, **options
-) -> Addplot:
+) -> list[Contour]:
     ax = ax if ax is not None else __get_or_create_ax()
-    ax.set_option("view", "{0}{90}")
-    options["contour gnuplot"] = True
-    return surf(x, y, z, ax, label, **options)
+    contours = create_contour(x, y, z, **options)
+    for contour in contours:
+        ax.add(contour)
+    return contours
+
+
+def contourf(
+    x, y, z, ax: Axis | None = None, label: str | None = None, **options
+) -> list[ContourFilled]:
+    ax = ax if ax is not None else __get_or_create_ax()
+    contours = create_contourf(x, y, z, **options)
+    for contour in contours:
+        ax.add(contour)
+    usetikzlibrary("fillbetween")
+    return contours
 
 
 def colorbar(ax: Axis | None = None):

@@ -28,6 +28,7 @@ from .api import (
     ylabel,
     zlabel,
     contour,
+    contourf,
     xlim,
     ylim,
     axhline,

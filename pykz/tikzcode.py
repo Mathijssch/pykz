@@ -67,6 +67,9 @@ class TikzCode:
     def draw(self, *coordinates, **options) -> "TikzCode":
         return self.__cmd(f"\\draw{format_options(**options)} {'--'.join(coordinates)};")
 
+    def fill(self, *coordinates, **options) -> "TikzCode":
+        return self.__cmd(f"\\draw{format_options(**options)} {'--'.join(coordinates)};")
+
     def add_line(self, line: Tex | str) -> "TikzCode":
         if isinstance(line, str):
             line = Tex(line)
