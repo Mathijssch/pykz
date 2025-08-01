@@ -93,14 +93,14 @@ def export_pdf_from_file(path: Pathlike) -> Path:
         )
     import os
 
-    basename = path.name
     for ext in {".aux", ".log"}:
         try:
-            print(f"Removing {basename + ext}")
-            os.remove(basename + ext)
+            aux_file_path = path.with_suffix(ext)
+            print(f"Removing {aux_file_path}")
+            os.remove(aux_file_path)
         except FileNotFoundError:
             ...
-    return Path(f"{basename}.pdf")
+    return path.with_suffix(".pdf")
 
 
 def export_png_from_file(input_file: Pathlike, **options) -> Path:
@@ -123,7 +123,7 @@ def export_png_from_file(input_file: Pathlike, **options) -> Path:
     import pdf2image
 
     pdf_file = export_pdf_from_file(input_file)
-    path = pdf_file.replace(".pdf", ".png")
+    path = pdf_file.with_suffix(".png")
     options["output_file"] = path
     pdf2image.convert_from_path(pdf_file, **options)
     return path

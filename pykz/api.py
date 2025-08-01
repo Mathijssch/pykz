@@ -15,6 +15,7 @@ from .plot import create_plot, create_surface_plot
 from .contour import create_contour, create_contourf, ContourFilled, Contour
 import numpy as np
 from typing import Optional, Union
+from pathlib import Path
 
 
 class WorkSpace:
@@ -160,13 +161,15 @@ def preview(fig: TikzPicture | None = None):
     fig.preview()
 
 
-def save(filename: str, fig: TikzPicture | None = None, standalone: bool = False):
+def save(
+    filename: str | Path, fig: TikzPicture | None = None, standalone: bool = False
+):
     """
     Save the generated Tikz code to a file.
 
     Parameters
     ----------
-    filename : str
+    filename : str | Path
         The path to write the figure to.
         If the extension `.tex` or `.tikz` is not present, `.tex` is appended.
     fig : TikzPicture, optional
@@ -174,7 +177,6 @@ def save(filename: str, fig: TikzPicture | None = None, standalone: bool = False
     standalone : bool, optional
         Whether to save as a standalone document, by default False
     """
-
     fig = gcf() if fig is None else fig
     if fig is None:
         return
