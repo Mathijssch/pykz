@@ -3,13 +3,14 @@ from __future__ import annotations
 from .. import formatting
 from ..tikzcode import TikzCode
 from ..commands.tikzset import Tikzset
+from pathlib import Path
+
 # from ..command import Command
 from .. import environment as env
 from . import axis as ax
 
 
 class TikzPicture(env.Environment):
-
     def __init__(self, standalone: bool = True, **options):
         super().__init__("tikzpicture", **options)
         self.standalone = standalone
@@ -41,7 +42,7 @@ class TikzPicture(env.Environment):
         preamble = self.preamble.get_code()
         for content in self.content.lines:
             if isinstance(content, env.Environment):
-                preamble += (content.requirements.get_code())
+                preamble += content.requirements.get_code()
         return preamble
 
     def format_styles(self) -> str:
@@ -67,22 +68,25 @@ class TikzPicture(env.Environment):
 
         return preamble + content
 
-    def export(self, filename: str):
+    def export(self, filename: str | Path):
         # Create the file directory if it doesn't exist already.
         import os
-        parent = os.path.dirname(filename)
-        if parent:
-            os.makedirs(os.path.dirname(filename), exist_ok=True)
 
-        if not filename.endswith(".tex") and \
-           not filename.endswith(".tikz"):
-            filename = filename + ".tex"
+        filename = Path(filename)
+
+        parent = filename.parent
+        if parent:
+            os.makedirs(parent, exist_ok=True)
+
+        if filename.suffix not in (".tex", ".tikz"):
+            filename = filename.with_suffix(".tex")
 
         with open(filename, "w") as f:
             f.write(self.get_code())
 
     def preview(self):
         from ..io import preview_latex_doc
+
         is_standalone = self.standalone
         self.standalone = True
         prev = preview_latex_doc(self.get_code())

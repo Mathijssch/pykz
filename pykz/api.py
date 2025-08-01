@@ -12,8 +12,10 @@ from .commands.draw import Draw
 from .commands.circle import Circle
 from .calc import Calc
 from .plot import create_plot, create_surface_plot
+from .contour import create_contour, create_contourf, ContourFilled, Contour
 import numpy as np
 from typing import Optional, Union
+from pathlib import Path
 
 
 class WorkSpace:
@@ -159,13 +161,15 @@ def preview(fig: TikzPicture | None = None):
     fig.preview()
 
 
-def save(filename: str, fig: TikzPicture | None = None, standalone: bool = False):
+def save(
+    filename: str | Path, fig: TikzPicture | None = None, standalone: bool = False
+):
     """
     Save the generated Tikz code to a file.
 
     Parameters
     ----------
-    filename : str
+    filename : str | Path
         The path to write the figure to.
         If the extension `.tex` or `.tikz` is not present, `.tex` is appended.
     fig : TikzPicture, optional
@@ -173,7 +177,6 @@ def save(filename: str, fig: TikzPicture | None = None, standalone: bool = False
     standalone : bool, optional
         Whether to save as a standalone document, by default False
     """
-
     fig = gcf() if fig is None else fig
     if fig is None:
         return
@@ -787,11 +790,32 @@ def surf(
 
 def contour(
     x, y, z, ax: Axis | None = None, label: str | None = None, **options
-) -> Addplot:
+) -> list[Contour]:
+    from .util import get_extremes_safely
+
     ax = ax if ax is not None else __get_or_create_ax()
-    ax.set_option("view", "{0}{90}")
-    options["contour gnuplot"] = True
-    return surf(x, y, z, ax, label, **options)
+    contours, levels = create_contour(x, y, z, **options)
+    for contour in contours:
+        ax.add(contour)
+    min, max = get_extremes_safely(levels)
+    ax.set_option("point meta min", min)
+    ax.set_option("point_meta_max", max)
+    return contours
+
+
+def contourf(
+    x, y, z, ax: Axis | None = None, label: str | None = None, **options
+) -> list[ContourFilled]:
+    from .util import get_extremes_safely
+
+    ax = ax if ax is not None else __get_or_create_ax()
+    contours, levels = create_contourf(x, y, z, **options)
+    for contour in contours:
+        ax.add(contour)
+    min, max = get_extremes_safely(levels)
+    ax.set_option("point meta min", min)
+    ax.set_option("point_meta_max", max)
+    return contours
 
 
 def colorbar(ax: Axis | None = None):

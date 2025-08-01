@@ -5,7 +5,6 @@ from .formatting import format_options
 
 
 class Tex:
-
     def __init__(self, code: str):
         self.code = code
 
@@ -54,18 +53,35 @@ class TikzCode:
         argcnt = f"[{n_args}]" if n_args > 0 else ""
         return self.__cmd(f"\\newcommand{{\\{command}}}{argcnt}{{{definition}}}")
 
-    def node(self,
-             label_text: str, name: str = "", location: Union[tuple, str] = "",
-             **options) -> "TikzCode":
+    def node(
+        self,
+        label_text: str,
+        name: str = "",
+        location: Union[tuple, str] = "",
+        **options,
+    ) -> "TikzCode":
         location_str = f"at {location}" if location else ""
-        return self.__cmd(f"\\node{format_options(**options)} ({name}) {location_str} {{{label_text}}};")
+        return self.__cmd(
+            f"\\node{format_options(**options)} ({name}) {location_str} {{{label_text}}};"
+        )
 
-    def coordinate(self, name: str = "", location: Union[tuple, str] = "", **options) -> "TikzCode":
+    def coordinate(
+        self, name: str = "", location: Union[tuple, str] = "", **options
+    ) -> "TikzCode":
         location_str = f"at {location}" if location else ""
-        return self.__cmd(f"\\coordinate{format_options(**options)} ({name}) {location_str};")
+        return self.__cmd(
+            f"\\coordinate{format_options(**options)} ({name}) {location_str};"
+        )
 
     def draw(self, *coordinates, **options) -> "TikzCode":
-        return self.__cmd(f"\\draw{format_options(**options)} {'--'.join(coordinates)};")
+        return self.__cmd(
+            f"\\draw{format_options(**options)} {'--'.join(coordinates)};"
+        )
+
+    def fill(self, *coordinates, **options) -> "TikzCode":
+        return self.__cmd(
+            f"\\draw{format_options(**options)} {'--'.join(coordinates)};"
+        )
 
     def add_line(self, line: Tex | str) -> "TikzCode":
         if isinstance(line, str):
@@ -75,3 +91,10 @@ class TikzCode:
 
     def get_code(self) -> str:
         return "\n".join(line.get_code() for line in self.lines) + "\n"
+
+    def remove(self, line: Tex | str) -> "TikzCode":
+        if isinstance(line, str):
+            line = Tex(line)
+        if line in self.lines:
+            self.lines.remove(line)
+        return self

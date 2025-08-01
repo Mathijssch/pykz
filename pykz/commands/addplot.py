@@ -1,12 +1,12 @@
 from __future__ import annotations
 
 from ..command import Command
-from ..options import Options
+from ..options import Options, OptionsMixin
 from ..formatting import format_plot_command
 import numpy as np
 
 
-class __AddplotBase(Command):
+class __AddplotBase(Command, OptionsMixin):
     def __init__(
         self,
         data: np.ndarray,
@@ -26,6 +26,9 @@ class __AddplotBase(Command):
     def customize_label(self, **options):
         """Customize the options of the inline label"""
         self._label_opts.set_options(**options)
+
+    def set_table_option(self, key: str, value: str):
+        self._table_opts.set_option(key, value)
 
     def get_code(self) -> str:
         return format_plot_command(
