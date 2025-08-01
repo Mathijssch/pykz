@@ -29,7 +29,7 @@ class ContourFilled(TikzCode):
             format_matrix(self.point_list[s:e], row_sep=r"\\")
             for s, e in zip(self.indices[:-1], self.indices[1:])
         ]
-        full_cycle = r"\\\n".join(formatted_lines)
+        full_cycle = "\n\\\\\n".join(formatted_lines)
         plot_cmd = Addplot(full_cycle, **self._options)
         self.add_line(plot_cmd)
 
