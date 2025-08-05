@@ -11,12 +11,12 @@ Generating contour plots directly from data.
 # Using the same underlying engine, `pykz` can bring this same type of plots
 # directly to pgfplots.
 
-# &&
+# %%
 # We import the usual libraries.
 import numpy as np
 import pykz
 
-# &&
+# %%
 # Let's generate some data. We do this in exactly the same way as you would using
 # Matplotlib.
 
@@ -31,7 +31,7 @@ def f(x, y):
 X, Y = np.meshgrid(x, y)
 Z = f(X, Y)
 
-# &&
+# %%
 # By default, `pykz` picks the contour levels to draw by
 # dividing the range of `z`-values into equally spaced bins.
 
@@ -43,10 +43,8 @@ pykz.ylabel("$y$")
 pykz.save("contour_plot.tex", standalone=True)
 # Build the pdf
 pykz.io.export_pdf_from_file("contour_plot.tex")
-# Or even output as an svg
-pykz.io.export_png_from_file("contour_plot.tex")
 
-# &&
+# %%
 # Of course you can also customize the plot in all kinds of ways.
 # For instance, let us change the colormap and visualize the z-values
 # with a colorbar. Also, let us set the x and y limits to be tight.
@@ -59,11 +57,9 @@ pykz.gca().enlarge_limits(0)
 pykz.save("contour_plot_fancy.tex", standalone=True)
 # Optionally, build the pdf
 pykz.io.export_pdf_from_file("contour_plot_fancy.tex")
-# Or even output as an svg
-pykz.io.export_png_from_file("contour_plot_fancy.tex")
 
 
-# &&
+# %%
 # Similarly, we can create filled contours. Let's get rid of the existing contour,
 # and replace it with a filled contour. Alternatively, we could of course just create
 # a new figure as well.
@@ -79,10 +75,8 @@ contourfs = pykz.contourf(X, Y, Z, levels=levels)
 pykz.save("contour_plot_filled.tex", standalone=True)
 # Optionally, build the pdf
 pykz.io.export_pdf_from_file("contour_plot_filled.tex")
-# Or even output as an svg
-pykz.io.export_png_from_file("contour_plot_filled.tex")
 
-# &&
+# %%
 # Or, we could go even further in customizing the appearance of the end result,
 # using options that get passed to the generated `pgfplots` `addplot` command.
 # Essentially any option that is recognized by `pgfplots` can be directly added here.
@@ -91,11 +85,10 @@ for contour in contourfs:
     pykz.gca().remove(contour)
 
 levels = np.linspace(-1, 1, 20)
-contourfs = pykz.contourf(X, Y, Z, levels=levels, draw=True, fill_opacity=0.5)
+contourfs = pykz.contourf(X, Y, Z, levels=levels, draw=True, fill_opacity=0.6)
 
 # Export your tex code as a standalone file
 pykz.save("contour_plot_filled_custom.tex", standalone=True)
 # Optionally, build the pdf
-pykz.io.export_pdf_from_file("contour_plot_filled_custom.tex")
-# Or even output as an svg
-pykz.io.export_png_from_file("contour_plot_filled_custom.tex")
+path_png = pykz.io.export_png_from_file("contour_plot_filled_custom.tex")
+print(path_png)
