@@ -788,9 +788,7 @@ def surf(
     return plot
 
 
-def contour(
-    x, y, z, ax: Axis | None = None, label: str | None = None, **options
-) -> list[Contour]:
+def contour(x, y, z, ax: Axis | None = None, **options) -> list[Contour]:
     from .util import get_extremes_safely
 
     ax = ax if ax is not None else __get_or_create_ax()
@@ -803,9 +801,7 @@ def contour(
     return contours
 
 
-def contourf(
-    x, y, z, ax: Axis | None = None, label: str | None = None, **options
-) -> list[ContourFilled]:
+def contourf(x, y, z, ax: Axis | None = None, **options) -> list[ContourFilled]:
     from .util import get_extremes_safely
 
     ax = ax if ax is not None else __get_or_create_ax()
@@ -815,6 +811,7 @@ def contourf(
     min, max = get_extremes_safely(levels)
     ax.set_option("point meta min", min)
     ax.set_option("point_meta_max", max)
+    ax.set_option("unbounded coords", "jump")
     return contours
 
 
