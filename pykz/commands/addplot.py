@@ -30,6 +30,11 @@ class __AddplotBase(Command, OptionsMixin):
     def set_table_option(self, key: str, value: str):
         self._table_opts.set_option(key, value)
 
+    def set_label(self, label: str, **label_options):
+        self.label = label
+        self._inline_label = True
+        self.customize_label(**label_options)
+
     def get_code(self) -> str:
         return format_plot_command(
             self.data,
