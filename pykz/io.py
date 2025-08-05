@@ -120,13 +120,9 @@ def export_png_from_file(input_file: Pathlike, **options) -> Path:
     Path
         The path to the generated png file.
     """
-    import pdf2image
-
     pdf_file = export_pdf_from_file(input_file)
-    path = pdf_file.with_suffix(".png")
-    options["output_file"] = path
-    pdf2image.convert_from_path(pdf_file, **options)
-    return path
+    output_path = pdf_file.with_suffix(".png")
+    return __convert_pdf_to_png(pdf_file, output_path, **options)
 
 
 def export_png_from_code(code: str, path: str, **options):
@@ -146,6 +142,14 @@ def export_png_from_code(code: str, path: str, **options):
     str
         The path to the generated png file.
     """
+    pdf_file = export_pdf_from_code(code)
+    output_path = str(path)
+    return __convert_pdf_to_png(pdf_file, output_path, **options)
+
+
+def __convert_pdf_to_png(
+    pdf_file: Pathlike, output_file: Pathlike | None = None, **options
+):
     try:
         import pdf2image
     except ImportError:
@@ -153,9 +157,20 @@ def export_png_from_code(code: str, path: str, **options):
             "Exporting to png relies on the dependency pdf2image. Install it using `pip install pdf2image`, or install pykz using `pip install pykz[png]`"
         )
 
-    pdf_file = export_pdf_from_code(code)
-    options["output_file"] = str(path)
-    pdf2image.convert_from_path(pdf_file, **options)
+    pdf_file = Path(pdf_file)
+    output_file = (
+        pdf_file.with_suffix(".png") if output_file is None else Path(output_file)
+    )
+    default_options = {
+        "output_file": output_file,
+        "single_file": True,
+        "transparent": True,
+    }
+    default_options.update(options)
+    images = pdf2image.convert_from_path(pdf_file, **default_options)
+    for image in images:
+        image.save(output_file)
+    return output_file
 
 
 def _subprocess(cmds: list[str], exception_cls: Type[WrapperError], **options):
