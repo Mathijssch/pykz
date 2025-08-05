@@ -11,6 +11,9 @@ class Tex:
     def __str__(self) -> str:
         return self.get_code()
 
+    def __repr__(self) -> str:
+        return f"Tex({self.get_code()})"
+
     def get_code(self) -> str:
         return self.code
 
