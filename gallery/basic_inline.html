@@ -260,6 +260,7 @@
 <li class="toctree-l1"><a class="reference internal" href="basic_customized.html">Basic customization</a></li>
 <li class="toctree-l1"><a class="reference internal" href="circles_and_squares.html">Directly using Tikz</a></li>
 <li class="toctree-l1"><a class="reference internal" href="low_level_tikz.html">Low-level Tikz commands</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contours.html">Countour plots</a></li>
 </ul>
 </div>
 </nav></div>
@@ -342,7 +343,12 @@ to download the full example code.</p>
 <span class="n">pykz</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">export_pdf_from_file</span><span class="p">(</span><span class="s2">&quot;basic_inline.tex&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_basic_inline_001.png" srcset="../_images/sphx_glr_basic_inline_001.png" alt="basic inline" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>PosixPath(&#39;basic_inline.tex.pdf&#39;)
+<img src="../_images/sphx_glr_basic_inline_001.png" srcset="../_images/sphx_glr_basic_inline_001.png" alt="basic inline" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/runner/work/pykz/pykz/pykz/exceptions.py:8: SyntaxWarning: &quot;\{&quot; is an invalid escape sequence. Such sequences will not work in the future. Did you mean &quot;\\{&quot;? A raw string is also an option.
+  message = f&quot;{self._decode_message(parent)}\n\{self.cmd_name} failed with the error above ☝️ &quot;
+Removing basic_inline.aux
+Removing basic_inline.log
+
+PosixPath(&#39;basic_inline.pdf&#39;)
 </pre></div>
 </div>
 <p>Alternatively, output it to png</p>
@@ -354,7 +360,7 @@ This would be the equivalent to <code class="docutils literal notranslate"><span
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">pykz</span><span class="o">.</span><span class="n">preview</span><span class="p">()</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.675 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.739 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-gallery-basic-inline-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/44e18befd40aa617aa85aa10155ab31d/basic_inline.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">basic_inline.ipynb</span></code></a></p>
@@ -370,6 +376,9 @@ This would be the equivalent to <code class="docutils literal notranslate"><span
 <div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="You can use keyword arguments to add options to your plots. These options generate pgfkeys options in the final output. Therefore, any string that can be interpreted by pdflatex is a valid value."><img alt="" src="../_images/sphx_glr_basic_customized_thumb.png" />
 <p><a class="reference internal" href="basic_customized.html#sphx-glr-gallery-basic-customized-py"><span class="std std-ref">Basic customization</span></a></p>
   <div class="sphx-glr-thumbnail-title">Basic customization</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Countour plots"><img alt="" src="../_images/sphx_glr_contours_thumb.png" />
+<p><a class="reference internal" href="contours.html#sphx-glr-gallery-contours-py"><span class="std std-ref">Countour plots</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Countour plots</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="Directly use Tikz functionality, without pgfplots."><img alt="" src="../_images/sphx_glr_circles_and_squares_thumb.png" />
 <p><a class="reference internal" href="circles_and_squares.html#sphx-glr-gallery-circles-and-squares-py"><span class="std std-ref">Directly using Tikz</span></a></p>
   <div class="sphx-glr-thumbnail-title">Directly using Tikz</div>

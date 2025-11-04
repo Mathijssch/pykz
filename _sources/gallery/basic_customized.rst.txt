@@ -60,8 +60,10 @@ valid value.
 
  .. code-block:: none
 
+    Removing basic_customized.aux
+    Removing basic_customized.log
 
-    PosixPath('basic_customized.tex.pdf')
+    PosixPath('basic_customized.pdf')
 
 
 
@@ -86,7 +88,7 @@ This would be the equivalent to ``plt.show()``
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.731 seconds)
+   **Total running time of the script:** (0 minutes 0.718 seconds)
 
 
 .. _sphx_glr_download_gallery_basic_customized.py:

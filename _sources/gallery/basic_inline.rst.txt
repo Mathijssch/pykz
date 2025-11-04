@@ -52,8 +52,12 @@ Minimal working example of `pykz`, plotting a simple sine function.
 
  .. code-block:: none
 
+    /home/runner/work/pykz/pykz/pykz/exceptions.py:8: SyntaxWarning: "\{" is an invalid escape sequence. Such sequences will not work in the future. Did you mean "\\{"? A raw string is also an option.
+      message = f"{self._decode_message(parent)}\n\{self.cmd_name} failed with the error above ☝️ "
+    Removing basic_inline.aux
+    Removing basic_inline.log
 
-    PosixPath('basic_inline.tex.pdf')
+    PosixPath('basic_inline.pdf')
 
 
 
@@ -78,7 +82,7 @@ This would be the equivalent to ``plt.show()``
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.675 seconds)
+   **Total running time of the script:** (0 minutes 0.739 seconds)
 
 
 .. _sphx_glr_download_gallery_basic_inline.py:

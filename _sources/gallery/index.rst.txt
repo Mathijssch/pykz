@@ -81,6 +81,23 @@ Welcome to the example gallery for pykz.
     </div>
 
 
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Countour plots">
+
+.. only:: html
+
+  .. image:: /gallery/images/thumb/sphx_glr_contours_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_gallery_contours.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Countour plots</div>
+    </div>
+
+
 .. thumbnail-parent-div-close
 
 .. raw:: html
@@ -95,6 +112,7 @@ Welcome to the example gallery for pykz.
    /gallery/basic_customized
    /gallery/circles_and_squares
    /gallery/low_level_tikz
+   /gallery/contours
 
 
 .. only:: html
