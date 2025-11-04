@@ -108,8 +108,8 @@ dividing the range of `z`-values into equally spaced bins.
 
  .. code-block:: none
 
-    Removing contour_plot.aux
     Removing contour_plot.log
+    Removing contour_plot.aux
 
     PosixPath('contour_plot.pdf')
 
@@ -149,8 +149,8 @@ with a colorbar. Also, let us set the x and y limits to be tight.
 
  .. code-block:: none
 
-    Removing contour_plot_fancy.aux
     Removing contour_plot_fancy.log
+    Removing contour_plot_fancy.aux
 
     PosixPath('contour_plot_fancy.pdf')
 
@@ -192,8 +192,8 @@ This time, let's also specify the contour levels we want to show,
 
  .. code-block:: none
 
-    Removing contour_plot_filled.aux
     Removing contour_plot_filled.log
+    Removing contour_plot_filled.aux
 
     PosixPath('contour_plot_filled.pdf')
 
@@ -234,8 +234,8 @@ Essentially any option that is recognized by `pgfplots` can be directly added he
 
  .. code-block:: none
 
-    Removing contour_plot_filled_custom.aux
     Removing contour_plot_filled_custom.log
+    Removing contour_plot_filled_custom.aux
     contour_plot_filled_custom.png
 
 
@@ -244,7 +244,7 @@ Essentially any option that is recognized by `pgfplots` can be directly added he
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 7.046 seconds)
+   **Total running time of the script:** (0 minutes 7.206 seconds)
 
 
 .. _sphx_glr_download_gallery_contours.py:
