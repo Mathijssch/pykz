@@ -6,10 +6,10 @@ from collections import OrderedDict
 
 
 class Tikzset(Command):
-
-    def __init__(self,
-                 styles: list[Style] | None = None,
-                 ):
+    def __init__(
+        self,
+        styles: list[Style] | None = None,
+    ):
         self._style_map = OrderedDict()
         if styles:
             for style in styles:
@@ -19,11 +19,17 @@ class Tikzset(Command):
         self._endline = False
 
     def add_argument(self, argument: Style):
-        raise NotImplementedError("To add a new style to tikzset, use the ``set_style`` method.")
+        raise NotImplementedError(
+            "To add a new style to tikzset, use the ``set_style`` method."
+        )
 
     @property
     def arguments(self) -> list[Style]:
         return list(self._style_map.values())
+
+    def _format_arguments(self) -> str:
+        inner = ",\n".join([a.get_code() for a in self.arguments])
+        return f"{{\n{inner}\n}}"
 
     def set_style(self, name: str, **options):
         if name in self._style_map:

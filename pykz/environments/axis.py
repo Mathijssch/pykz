@@ -34,47 +34,52 @@ class Grid(Enum):
 
 
 class Axis(Environment):
-
-    def __init__(self,
-                 xlabel: str | None = None,
-                 ylabel: str | None = None,
-                 view: View | None = None,
-                 width: str | None = None,
-                 height: str | None = None,
-                 scale_only_axis: bool = False,
-                 axis_x_line: str | None = None,
-                 axis_y_line: str | None = None,
-                 axis_z_line: str | None = None,
-                 xmode: AxisMode | None = None,
-                 ymode: AxisMode | None = None,
-                 zmode: AxisMode | None = None,
-                 x_dir: AxisDir | None = None,
-                 y_dir: AxisDir | None = None,
-                 z_dir: AxisDir | None = None,
-                 axis_equal: bool = False,
-                 axis_equal_image: bool = False,
-                 xmin: float | None = None, xmax: float | None = None,
-                 ymin: float | None = None, ymax: float | None = None,
-                 zmin: float | None = None, zmax: float | None = None,
-                 grid: Grid | None = None,
-                 xminorgrids: bool | None = None,
-                 yminorgrids: bool | None = None,
-                 zminorgrids: bool | None = None,
-                 xmajorgrids: bool | None = None,
-                 ymajorgrids: bool | None = None,
-                 zmajorgrids: bool | None = None,
-                 xtick: str | None = None,
-                 ytick: str | None = None,
-                 ztick: str | None = None,
-                 **extra
-                 ):
+    def __init__(
+        self,
+        xlabel: str | None = None,
+        ylabel: str | None = None,
+        view: View | None = None,
+        width: str | None = None,
+        height: str | None = None,
+        scale_only_axis: bool = False,
+        axis_x_line: str | None = None,
+        axis_y_line: str | None = None,
+        axis_z_line: str | None = None,
+        xmode: AxisMode | None = None,
+        ymode: AxisMode | None = None,
+        zmode: AxisMode | None = None,
+        x_dir: AxisDir | None = None,
+        y_dir: AxisDir | None = None,
+        z_dir: AxisDir | None = None,
+        axis_equal: bool = False,
+        axis_equal_image: bool = False,
+        xmin: float | None = None,
+        xmax: float | None = None,
+        ymin: float | None = None,
+        ymax: float | None = None,
+        zmin: float | None = None,
+        zmax: float | None = None,
+        grid: Grid | None = None,
+        xminorgrids: bool | None = None,
+        yminorgrids: bool | None = None,
+        zminorgrids: bool | None = None,
+        xmajorgrids: bool | None = None,
+        ymajorgrids: bool | None = None,
+        zmajorgrids: bool | None = None,
+        xtick: str | None = None,
+        ytick: str | None = None,
+        ztick: str | None = None,
+        **extra,
+    ):
         arguments = locals()
         arguments.pop("extra")
         arguments.pop("self")
         arguments.pop("__class__")
-        arguments = {key.replace("_", " "): value for (key, value) in arguments.items()
-                     if value is not None
-                     }
+        arguments = {
+            key.replace("_", " "): value
+            for (key, value) in arguments.items()
+            if value is not None
+        }
         super().__init__("axis", **arguments, **extra)
 
     def set_xlabel(self, label: str):
@@ -91,7 +96,9 @@ class Axis(Environment):
         """
         allowed_dirs = ["x", "y", None]
         if direction not in allowed_dirs:
-            raise ValueError(f"Expected direction to belong to {allowed_dirs}. Got {direction}")
+            raise ValueError(
+                f"Expected direction to belong to {allowed_dirs}. Got {direction}"
+            )
 
         if direction:
             self.set_option(f"enlarge {direction} limits", amount)
@@ -103,6 +110,15 @@ class Axis(Environment):
     #     self.set_option("axis line style", Options(
     #         **{"shorten >": "-10pt", "shorten <": "-10pt"}
     #     ))
+    #
+    def set_xmode(self, mode: str):
+        self.set_option("xmode", mode)
+
+    def set_ymode(self, mode: str):
+        self.set_option("ymode", mode)
+
+    def set_zmode(self, mode: str):
+        self.set_option("zmode", mode)
 
     def set_ylabel(self, label: str):
         self.options.set_option("ylabel", label)
@@ -110,17 +126,25 @@ class Axis(Environment):
     def set_zlabel(self, label: str):
         self.options.set_option("zlabel", label)
 
+    def _set_lims(self, lims, labels):
+        for lim, lab in zip(lims, labels):
+            if lim is not None:
+                self.options[lab] = lim
+
     def set_xlims(self, lims: tuple[float]):
-        (self.options["xmin"], self.options["xmax"]) = lims
+        self._set_lims(lims, ["xmin", "xmax"])
 
     def set_ylims(self, lims: tuple[float]):
-        (self.options["ymin"], self.options["ymax"]) = lims
+        self._set_lims(lims, ["ymin", "ymax"])
 
     def set_zlims(self, lims: tuple[float]):
-        (self.options["zmin"], self.options["zmax"]) = lims
+        self._set_lims(lims, ["zmin", "zmax"])
 
     def get_ylims(self) -> tuple:
         return (self.options.get("ymin", -1), self.options.get("ymax", 1))
+
+    def get_xlims(self) -> tuple:
+        return (self.options.get("xmin", -1), self.options.get("xmax", 1))
 
     def center(self):
         """Center the axis lines"""
@@ -146,19 +170,16 @@ class Axis(Environment):
             raise ValueError(f"Expected position in {known_positions}. Got {position}.")
 
         self.center()
-        anchors = dict(
-            above="south",
-            below="north",
-            left="east",
-            right="west"
-        )
+        anchors = dict(above="south", below="north", left="east", right="west")
 
         self.update_option(f"{axis} label style", "anchor", anchors[position])
 
     def boxed(self):
         self.set_option("axis lines", "box")
 
-    def _set_ticks(self, values: tuple[float], labels: tuple[str] | None, direction: str):
+    def _set_ticks(
+        self, values: tuple[float], labels: tuple[str] | None, direction: str
+    ):
         self.set_option(f"{direction}tick", f"{{{format_list(values)}}}")
         if labels is not None:
             self.set_option(f"{direction}ticklabels", f"{{{format_list(labels)}}}")

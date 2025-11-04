@@ -3,8 +3,14 @@
 from __future__ import annotations
 
 import os
-from typing import Any
+from typing import Any, Type
 from pathlib import Path
+from .exceptions import (
+    PDFlatexNotFoundError,
+    CompilationError,
+    OpenPdfException,
+    WrapperError,
+)
 
 Pathlike = str | Path
 
@@ -64,8 +70,7 @@ def export_pdf_from_file(path: Pathlike) -> Path:
     CompilationError:
         If the given document could not be compiled by pdflatex.
     """
-    import subprocess
-    from .exceptions import PDFlatexNotFoundError, CompilationError
+    # from .exceptions import PDFlatexNotFoundError, CompilationError
 
     path = Path(path)
     working_dir = path.parent
@@ -74,7 +79,6 @@ def export_pdf_from_file(path: Pathlike) -> Path:
     if working_dir:
         options["cwd"] = working_dir
 
-    try:
         import shutil
 
         pdflatex_path = shutil.which("pdflatex")
@@ -83,25 +87,20 @@ def export_pdf_from_file(path: Pathlike) -> Path:
                 f"Could not find executable `pdflatex` to compile {path}. Please make sure it is installed and accessible in the system's path."
             )
 
-        subprocess.run(
+        _subprocess(
             [pdflatex_path, "-interaction=nonstopmode", "-halt-on-error", path],
-            **options,
+            CompilationError,
         )
-        # print("Pdflatex done!")
-    except subprocess.CalledProcessError as e:
-        error_message = (
-            f"{e.stdout.decode('UTF-8')}\n\nCompilation failed with the error above ☝️ "
-        )
-        raise CompilationError(error_message)
     import os
 
-    basename = path.name
     for ext in {".aux", ".log"}:
         try:
-            os.remove(basename + ext)
+            aux_file_path = path.with_suffix(ext)
+            print(f"Removing {aux_file_path}")
+            os.remove(aux_file_path)
         except FileNotFoundError:
             ...
-    return Path(f"{basename}.pdf")
+    return path.with_suffix(".pdf")
 
 
 def export_png_from_file(input_file: Pathlike, **options) -> Path:
@@ -121,13 +120,9 @@ def export_png_from_file(input_file: Pathlike, **options) -> Path:
     Path
         The path to the generated png file.
     """
-    import pdf2image
-
     pdf_file = export_pdf_from_file(input_file)
-    path = pdf_file.replace(".pdf", ".png")
-    options["output_file"] = path
-    pdf2image.convert_from_path(pdf_file, **options)
-    return path
+    output_path = pdf_file.with_suffix(".png")
+    return __convert_pdf_to_png(pdf_file, output_path, **options)
 
 
 def export_png_from_code(code: str, path: str, **options):
@@ -147,6 +142,14 @@ def export_png_from_code(code: str, path: str, **options):
     str
         The path to the generated png file.
     """
+    pdf_file = export_pdf_from_code(code)
+    output_path = str(path)
+    return __convert_pdf_to_png(pdf_file, output_path, **options)
+
+
+def __convert_pdf_to_png(
+    pdf_file: Pathlike, output_file: Pathlike | None = None, **options
+):
     try:
         import pdf2image
     except ImportError:
@@ -154,9 +157,32 @@ def export_png_from_code(code: str, path: str, **options):
             "Exporting to png relies on the dependency pdf2image. Install it using `pip install pdf2image`, or install pykz using `pip install pykz[png]`"
         )
 
-    pdf_file = export_pdf_from_code(code)
-    options["output_file"] = str(path)
-    pdf2image.convert_from_path(pdf_file, **options)
+    pdf_file = Path(pdf_file)
+    output_file = (
+        pdf_file.with_suffix(".png") if output_file is None else Path(output_file)
+    )
+    default_options = {
+        "output_file": output_file,
+        "single_file": True,
+        "transparent": True,
+    }
+    default_options.update(options)
+    images = pdf2image.convert_from_path(pdf_file, **default_options)
+    for image in images:
+        image.save(output_file)
+    return output_file
+
+
+def _subprocess(cmds: list[str], exception_cls: Type[WrapperError], **options):
+    import subprocess
+
+    default_options: dict[str, Any] = dict(capture_output=True, check=True)
+    default_options.update(options)
+    try:
+        result = subprocess.run(cmds, **options)
+    except subprocess.CalledProcessError as e:
+        raise exception_cls(e)
+    return result
 
 
 def open_pdf_file(file_path: str):
@@ -169,23 +195,20 @@ def open_pdf_file(file_path: str):
         Path to the pdf file to open.
     """
     import sys
-    import subprocess
 
-    print("Opening pdf file")
+    print(f"Opening pdf file {file_path} ...")
 
     if sys.platform.startswith("darwin"):  # macOS
-        result = subprocess.run(["open", file_path], capture_output=True, text=True)
+        _subprocess(["open", file_path], OpenPdfException)
     elif sys.platform.startswith("win32"):  # Windows
         import os
 
-        result = os.startfile(file_path)
+        os.startfile(file_path)
     elif sys.platform.startswith("linux"):  # Linux
-        result = subprocess.run(["xdg-open", file_path], capture_output=True, text=True)
+        _subprocess(["xdg-open", file_path], OpenPdfException)
     else:
         print("Unsupported platform. Unable to open PDF file.")
     input("Press any key to continue.")
-    if result.returncode != 0:
-        print(sys.stdout)
 
 
 def preview_latex_doc(code: str) -> str:
@@ -212,10 +235,16 @@ def preview_latex_doc(code: str) -> str:
         open_pdf_file(pdf_path)
     except Exception as e:
         try:
+            print(f"Removing {pdf_path}")
             os.remove(pdf_path)
-        except FileNotFoundError():
-            ...
+        except FileNotFoundError:
+            print(f"Could not remove {pdf_path}. File not found.")
         raise e
+    try:
+        print(f"Removing {pdf_path}")
+        os.remove(pdf_path)
+    except FileNotFoundError:
+        print(f"Could not remove {pdf_path}. File not found.")
 
 
 if __name__ == "__main__":

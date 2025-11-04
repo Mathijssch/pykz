@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from .tikzcode import TikzCode
 from .environments.axis import Axis
 from .environments.tikzpicture import TikzPicture
 from .commands.addplot import Addplot
@@ -9,9 +10,12 @@ from .commands.fillbetween import FillBetween
 from .commands.node import Node
 from .commands.draw import Draw
 from .commands.circle import Circle
-from .plot import create_plot
+from .calc import Calc
+from .plot import create_plot, create_surface_plot
+from .contour import create_contour, create_contourf, ContourFilled, Contour
 import numpy as np
 from typing import Optional, Union
+from pathlib import Path
 
 
 class WorkSpace:
@@ -157,13 +161,15 @@ def preview(fig: TikzPicture | None = None):
     fig.preview()
 
 
-def save(filename: str, fig: TikzPicture | None = None, standalone: bool = False):
+def save(
+    filename: str | Path, fig: TikzPicture | None = None, standalone: bool = False
+):
     """
     Save the generated Tikz code to a file.
 
     Parameters
     ----------
-    filename : str
+    filename : str | Path
         The path to write the figure to.
         If the extension `.tex` or `.tikz` is not present, `.tex` is appended.
     fig : TikzPicture, optional
@@ -171,7 +177,6 @@ def save(filename: str, fig: TikzPicture | None = None, standalone: bool = False
     standalone : bool, optional
         Whether to save as a standalone document, by default False
     """
-
     fig = gcf() if fig is None else fig
     if fig is None:
         return
@@ -243,6 +248,76 @@ def zticks(ticks: np.ndarray, labels: list[str] | None = None, ax: Axis | None =
     ax.set_zticks(ticks, labels)
 
 
+def usepackage(package_name: str, fig: TikzPicture | None = None, **options):
+    """
+    Add a usepackage statement to the current or given figure.
+
+    Parameters
+    ----------
+    name : str
+        Name of the style to define
+    fig : TikzPicture, optional
+        Figure to include the package in. If None, uses current figure.
+    **options
+        Style options to set
+    """
+    fig = __get_or_create_fig() if fig is None else fig
+    fig.usepackage(package_name, **options)
+
+
+def usepgfplotslibrary(library_name: str, fig: TikzPicture | None = None, **options):
+    """
+    Add a usepgfplotslibrary-statement to the current or given figure.
+
+    Parameters
+    ----------
+    library_name : str
+        Name of the library to import
+    fig : TikzPicture, optional
+        Figure to include the package in. If None, uses current figure.
+    **options
+        Style options to set
+    """
+    fig = __get_or_create_fig() if fig is None else fig
+    fig.usepgfplotslibrary(library_name, **options)
+
+
+def usetikzlibrary(library_name: str, fig: TikzPicture | None = None, **options):
+    """
+    Add a usetikzlibrary-statement to the current or given figure.
+
+    Parameters
+    ----------
+    library_name : str
+        Name of the library to import
+    fig : TikzPicture, optional
+        Figure to include the package in. If None, uses current figure.
+    **options
+        Style options to set
+    """
+    fig = __get_or_create_fig() if fig is None else fig
+    fig.preamble.usetikzlibrary(library_name, **options)
+
+
+def newcommand(
+    name: str, implementation: str, n_args: int = 0, fig: TikzPicture | None = None
+):
+    """
+    Define a new command for the figure.
+
+    Parameters
+    ----------
+    name : str
+        Name of the command to define
+    implementation: str
+        String to use as the implementation of the new command
+    fig : TikzPicture, optional
+        Figure to define the style for. If None, uses current figure.
+    """
+    fig = __get_or_create_fig() if fig is None else fig
+    fig.preamble.newcommand(name, implementation, n_args)
+
+
 def define_style(name: str, fig: TikzPicture | None = None, **options):
     """
     Define a new style for the figure.
@@ -258,6 +333,12 @@ def define_style(name: str, fig: TikzPicture | None = None, **options):
     """
     fig = __get_or_create_fig() if fig is None else fig
     fig.set_style(name, **options)
+
+
+def calc(pt: str, offset: tuple[float] | str, fig: TikzPicture | None = None) -> Calc:
+    usetikzlibrary("calc", fig)
+    calc = Calc(pt, offset)
+    return calc
 
 
 def ylabel(lab: str):
@@ -330,7 +411,9 @@ def axhline(y: float, ax: Axis | None = None, **options) -> list[Addplot]:
     list[Addplot]
         List of plot commands created
     """
-    return plot(y, ax, **options)
+    ax = __get_or_create_ax() if ax is None else ax
+    xlims = ax.get_xlims()
+    return plot(xlims, [y, y], ax=ax, **options)
 
 
 def scale(scale: float, fig: TikzPicture | None = None):
@@ -348,15 +431,17 @@ def scale(scale: float, fig: TikzPicture | None = None):
     fig.set_option("scale", scale)
 
 
-def point(coordinates: np.ndarray | None = None,
-          label: str = "",
-          name: str | None = None,
-          axis_coords: bool | None = None,
-          label_loc: str = "above",
-          size: int | str = "1pt",
-          axis: Axis | None = None,
-          fig: TikzPicture | None = None,
-          **options) -> Node:
+def point(
+    coordinates: np.ndarray | None = None,
+    label: str = "",
+    name: str | None = None,
+    axis_coords: bool | None = None,
+    label_loc: str = "above",
+    size: int | str = "1pt",
+    axis: Axis | None = None,
+    fig: TikzPicture | None = None,
+    **options,
+) -> Node:
     """
     Draw a point at the given coordinates.
 
@@ -397,14 +482,16 @@ def point(coordinates: np.ndarray | None = None,
     return nd
 
 
-def node(coordinates: np.ndarray | None = None,
-         label: str | None = None,
-         name: str | None = None,
-         axis_coords: bool | None = None,
-         label_loc: str | None = None,
-         axis: Axis | None = None,
-         fig: TikzPicture | None = None,
-         **options) -> Node:
+def node(
+    coordinates: np.ndarray | None = None,
+    label: str = "",
+    name: str = "",
+    axis_coords: bool | None = None,
+    label_loc: str | None = None,
+    axis: Axis | None = None,
+    fig: TikzPicture | None = None,
+    **options,
+) -> Node:
     """
     Draw a node at the given coordinates.
 
@@ -449,8 +536,14 @@ def node(coordinates: np.ndarray | None = None,
     return node
 
 
-def fill_between(x: np.ndarray, y1: np.ndarray, y2: np.ndarray, *,
-                 draw_options=None, fill_options=None) -> FillBetween:
+def fill_between(
+    x: np.ndarray,
+    y1: np.ndarray,
+    y2: np.ndarray,
+    *,
+    draw_options=None,
+    fill_options=None,
+) -> FillBetween:
     """
     Fill the area between two curves.
 
@@ -509,7 +602,7 @@ def axvline(x: float, ax: Axis | None = None, **options) -> list[Addplot]:
     -------
     list[Addplot]
         List of plot commands created
-    """    # TODO: Think of ways to represent this allow axes dimensions to be updated afterwards.
+    """  # TODO: Think of ways to represent this allow axes dimensions to be updated afterwards.
     ax = ax if ax is not None else __get_or_create_ax()
     ymin, ymax = ax.get_ylims()
     xes = np.array((x, x))
@@ -522,6 +615,7 @@ Point = Union[np.ndarray, str, Node]
 
 def __create_draw(connector_type: str, points: list[Point], **options) -> Draw:
     from .commands import Connector
+
     connector = Connector(connector_type)
     draw = Draw(points, connector, **options)
     return draw
@@ -534,7 +628,6 @@ def __add_draw_command(draw: Draw) -> Draw:
 
 
 def __create_and_add_draw(connector_type: str, points: list[Point], **options):
-
     draw = __create_draw(connector_type, points, **options)
     return __add_draw_command(draw)
 
@@ -603,8 +696,13 @@ def line(points: list[Point], connection: str = "--", **options) -> Draw:
     return __create_and_add_draw(connection, points, **options)
 
 
-def arrow(points: list[Point], forward: bool = True, backward: bool = False,
-          arrowhead: str | None = None, **options) -> Draw:
+def arrow(
+    points: list[Point],
+    forward: bool = True,
+    backward: bool = False,
+    arrowhead: str | None = None,
+    **options,
+) -> Draw:
     """
     Draw an arrow through a list of points.
 
@@ -639,9 +737,15 @@ def arrow(points: list[Point], forward: bool = True, backward: bool = False,
     return line(points, **options)
 
 
-def plot(x, y=None, z=None, ax: Axis | None = None, label: str | tuple[str] | None = None,
-         inline_label: bool = False,
-         **options) -> list[Addplot]:
+def plot(
+    x,
+    y=None,
+    z=None,
+    ax: Axis | None = None,
+    label: str | tuple[str] | None = None,
+    inline_label: bool = False,
+    **options,
+) -> list[Addplot]:
     """
     Create a plot command.
 
@@ -675,9 +779,56 @@ def plot(x, y=None, z=None, ax: Axis | None = None, label: str | tuple[str] | No
     return plot_commands
 
 
-def scatter(x, y=None, z=None, ax: Axis | None = None, label: str | tuple[str] | None = None,
-            inline_label: bool = False,
-            **options) -> list[Addplot]:
+def surf(
+    x, y, z, ax: Axis | None = None, label: str | None = None, **options
+) -> Addplot:
+    ax = ax if ax is not None else __get_or_create_ax()
+    plot = create_surface_plot(x, y, z, label, **options)
+    ax.add(plot)
+    return plot
+
+
+def contour(x, y, z, ax: Axis | None = None, **options) -> list[Contour]:
+    from .util import get_extremes_safely
+
+    ax = ax if ax is not None else __get_or_create_ax()
+    contours, levels = create_contour(x, y, z, **options)
+    for contour in contours:
+        ax.add(contour)
+    min, max = get_extremes_safely(levels)
+    ax.set_option("point meta min", min)
+    ax.set_option("point_meta_max", max)
+    return contours
+
+
+def contourf(x, y, z, ax: Axis | None = None, **options) -> list[ContourFilled]:
+    from .util import get_extremes_safely
+
+    ax = ax if ax is not None else __get_or_create_ax()
+    contours, levels = create_contourf(x, y, z, **options)
+    for contour in contours:
+        ax.add(contour)
+    min, max = get_extremes_safely(levels)
+    ax.set_option("point meta min", min)
+    ax.set_option("point_meta_max", max)
+    ax.set_option("unbounded coords", "jump")
+    return contours
+
+
+def colorbar(ax: Axis | None = None):
+    ax = ax if ax is not None else __get_or_create_ax()
+    ax.set_option("colorbar", True)
+
+
+def scatter(
+    x,
+    y=None,
+    z=None,
+    ax: Axis | None = None,
+    label: str | tuple[str] | None = None,
+    inline_label: bool = False,
+    **options,
+) -> list[Addplot]:
     """
     Create a scatter plot command.
 
@@ -705,3 +856,32 @@ def scatter(x, y=None, z=None, ax: Axis | None = None, label: str | tuple[str] |
     """
     options["only marks"] = True
     return plot(x, y, z, ax, label, inline_label, **options)
+
+
+def semilogy(ax: Axis | None = None):
+    from .environments.axis import AxisMode
+
+    ax = __get_or_create_ax() if ax is None else ax
+    ax.set_xmode(AxisMode.linear.value)
+    ax.set_ymode(AxisMode.log.value)
+
+
+def semilogx(ax: Axis | None = None):
+    from .environments.axis import AxisMode
+
+    ax = __get_or_create_ax() if ax is None else ax
+    ax.set_xmode(AxisMode.log.value)
+    ax.set_ymode(AxisMode.linear.value)
+
+
+def loglog(ax: Axis | None = None):
+    from .environments.axis import AxisMode
+
+    ax = __get_or_create_ax() if ax is None else ax
+    ax.set_xmode(AxisMode.log.value)
+    ax.set_ymode(AxisMode.log.value)
+
+
+def preamble(fig: TikzPicture | None = None) -> TikzCode:
+    fig = __get_or_create_fig() if fig is None else fig
+    return fig.preamble

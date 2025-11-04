@@ -22,7 +22,7 @@ def format_options(replace_underscores=True, with_brackets=True, **options) -> s
         else:
             if replace_underscores:
                 name = name.replace("_", " ")
-            opts.append(f"{name}={value}")
+            opts.append(f"{name}={{{value}}}")
 
     if opts:
         options_str = ",\n".join(opts)
@@ -104,7 +104,9 @@ def format_plot_command(
         else:
             labelcmd = f"\\addlegendentry{{{label}}}"
     tablecmd = (
-        f"table{table_opts}" if (data is not None) and (np.ndim(data) >= 1) else ""
+        f"table{table_opts}"
+        if (data is not None) and ((np.ndim(data) >= 1) or (isinstance(data, str)))
+        else ""
     )
     return f"""
 \\addplot{"3" if plot3d else ""}{"+" if plotplus else ""}{raw_options}

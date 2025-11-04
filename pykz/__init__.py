@@ -17,8 +17,18 @@ from .api import (
     yticks,
     zticks,
     define_style,
+    usepackage,
+    usepgfplotslibrary,
+    usetikzlibrary,
+    calc,
+    newcommand,
+    semilogy,
+    semilogx,
+    loglog,
     ylabel,
     zlabel,
+    contour,
+    contourf,
     xlim,
     ylim,
     axhline,
@@ -34,6 +44,8 @@ from .api import (
     plot,
     scatter,
     point,
+    preamble,
+    colorbar,
 )
 from .environments.axis import Grid, Axis, AxisMode, AxisDir, View
 from . import io
@@ -74,4 +86,15 @@ __all__ = [
     "AxisDir",
     "View",
     "io",
+    "usepackage",
+    "usepgfplotslibrary",
+    "usetikzlibrary",
+    "newcommand",
+    "preamble",
+    "calc",
+    "semilogy",
+    "semilogx",
+    "loglog",
+    "contour",
+    "colorbar"
 ]

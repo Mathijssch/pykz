@@ -14,6 +14,7 @@ class Command(Tex, OptionsMixin):
         for argument in arguments:
             self.add_argument(argument)
         self.init_options(**options)
+        self._suffix = []
         self._endline = True
         self._escape = True
 
@@ -26,7 +27,7 @@ class Command(Tex, OptionsMixin):
         return ""
 
     def _format_post(self) -> str:
-        return ""
+        return " ".join([s.get_code() for s in self._suffix])
 
     @property
     def arguments(self) -> list[Tex]:
@@ -35,8 +36,15 @@ class Command(Tex, OptionsMixin):
     def _format_arguments(self) -> str:
         argument_str = ""
         for argument in self.arguments:
+            assert isinstance(argument, Tex), (
+                f"Expected arguments to command {self.cmd_name} to be of type TeX, but got {type(argument)}."
+            )
             argument_str += f"{{{argument.get_code()}}}"
         return argument_str
+
+    def append(self, tex: str | Tex) -> "Command":
+        tex = tex if isinstance(tex, Tex) else Tex(str(tex))
+        self._suffix.append(tex)
 
     def get_code(self) -> str:
         options_str = self.options.format()

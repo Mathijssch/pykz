@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from ..command import Command
 from .node import Node
+from ..tikzcode import Tex
 from ..formatting import format_vector
 import numpy as np
 from typing import Iterable
@@ -9,21 +10,23 @@ from .connector import Connector
 
 
 class Draw(Command):
-
-    def __init__(self,
-                 points: Iterable[np.ndarray | str | Node],
-                 connector: Connector,
-                 **options,
-                 ):
+    def __init__(
+        self,
+        points: Iterable[np.ndarray | str | Node | Tex],
+        connector: Connector,
+        **options,
+    ):
         self.points = points
         self._connector = connector
         super().__init__("draw", **options)
 
-    def _format_pt(self, pt: np.ndarray | str | Node) -> str:
+    def _format_pt(self, pt: np.ndarray | str | Node | Tex) -> str:
         if isinstance(pt, Node):
             return f"{pt.name}"
         if isinstance(pt, (str, float)):
             return f"{pt}"
+        if isinstance(pt, Tex):
+            return pt.get_code()
         return format_vector(pt, ", ")
 
     def _format_middle(self) -> str:

@@ -20,6 +20,9 @@ class Environment(Tex, OptionsMixin):
     def add(self, content: Union[Tex, str]):
         self.content.add_line(content)
 
+    def remove(self, content: Tex | str) -> "TikzCode":
+        self.content.remove(content)
+
     def get_code(self) -> str:
         return wrap_env(self.name, self.content.get_code(), **self.options)
 
@@ -28,3 +31,6 @@ class Environment(Tex, OptionsMixin):
 
     def requires_package(self, package_name: str, **options):
         self.requirements.usepackage(package_name, **options)
+
+    def requires_tikzlibrary(self, library_name: str, **options):
+        self.requirements.usetikzlibrary(library_name, **options)
