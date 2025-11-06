@@ -34,3 +34,6 @@ class Environment(Tex, OptionsMixin):
 
     def requires_tikzlibrary(self, library_name: str, **options):
         self.requirements.usetikzlibrary(library_name, **options)
+
+    def requires_pgfplotslibrary(self, library_name: str, **options):
+        self.requirements.usepgfplotslibrary(library_name, **options)

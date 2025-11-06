@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+from numpy.typing import ArrayLike
+
+from pykz.options import Options
 from .tikzcode import TikzCode
 from .environments.axis import Axis
 from .environments.tikzpicture import TikzPicture
@@ -856,6 +859,52 @@ def scatter(
     """
     options["only marks"] = True
     return plot(x, y, z, ax, label, inline_label, **options)
+
+
+def hist(
+    values: ArrayLike,
+    bins: Optional[int] = None,
+    ax: Axis | None = None,
+    hist_options: dict[str, str] = {},
+    label: str | None = None,
+    # inline_label: bool = False,
+    **options,
+) -> Addplot:
+    """
+    Create a histogram plot command.
+
+    Parameters
+    ----------
+    values : array-like
+        data values
+    bins:
+        Optional: bins to use
+    ax : Axis, optional
+        Axis to add the plot to
+    label : str | tuple[str], optional
+        Label or tuple of labels for the plot
+    inline_label : bool, optional
+        Whether to place label inline with the plot, by default False
+    **options
+        Additional plotting options
+
+    Returns
+    -------
+    Addplot
+        Newly created plot command
+    """
+    ax = __get_or_create_ax() if ax is None else ax
+    ax.requires_pgfplotslibrary("statistics")
+
+    values = np.asarray(values)
+    _hist_options = {"bins": bins} if bins is not None else dict()
+    _hist_options.update(hist_options)
+    _options = {"hist": Options(**_hist_options)}
+    _options.update(options)
+    plot_command = Addplot(values[:, np.newaxis], label=label, **_options)
+    plot_command.set_table_option("y index", 0)
+    ax.add(plot_command)
+    return plot_command
 
 
 def semilogy(ax: Axis | None = None):
