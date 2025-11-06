@@ -54,9 +54,9 @@ def create_surface_plot(
 
 def create_plot(
     x: np.ndarray,
-    y: np.ndarray,
-    z: np.ndarray,
-    label: str | None = None,
+    y: np.ndarray | None,
+    z: np.ndarray | None,
+    label: str | list[str] | None = None,
     inline_label: bool = False,
     **options,
 ) -> list[Addplot]:

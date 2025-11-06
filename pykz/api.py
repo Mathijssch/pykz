@@ -907,6 +907,49 @@ def hist(
     return plot_command
 
 
+def bar(
+    x,
+    y=None,
+    ax: Axis | None = None,
+    label: str | tuple[str] | None = None,
+    inline_label: bool = False,
+    **options,
+) -> list[Addplot]:
+    """
+    Create a plot command.
+
+    Parameters
+    ----------
+    x : array-like
+        x-coordinates or data
+    y : array-like, optional
+        y-coordinates
+    ax : Axis, optional
+        Axis to add the plot to
+    label : str | tuple[str], optional
+        Label or tuple of labels for the plot
+    inline_label : bool, optional
+        Whether to place label inline with the plot, by default False
+    **options
+        Additional plotting options
+
+    Returns
+    -------
+    list[Addplot]
+        List of plot commands created
+    """
+
+    ax = ax if ax is not None else __get_or_create_ax()
+    _options = {"ybar": True}
+    _options.update(options)
+    plot_commands = create_plot(
+        x, y, z=None, label=label, inline_label=inline_label, **_options
+    )
+    for plt in plot_commands:
+        ax.add(plt)
+    return plot_commands
+
+
 def semilogy(ax: Axis | None = None):
     from .environments.axis import AxisMode
 
