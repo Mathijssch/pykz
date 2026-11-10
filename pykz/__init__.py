@@ -46,6 +46,8 @@ from .api import (
     point,
     preamble,
     colorbar,
+    hist,
+    bar
 )
 from .environments.axis import Grid, Axis, AxisMode, AxisDir, View
 from . import io
@@ -96,5 +98,7 @@ __all__ = [
     "semilogx",
     "loglog",
     "contour",
-    "colorbar"
+    "colorbar",
+    "hist",
+    "bar",
 ]

@@ -52,6 +52,9 @@ class TikzCode:
     def usetikzlibrary(self, package: str, **options) -> "TikzCode":
         return self.__cmd(f"\\usetikzlibrary{format_options(**options)}{{{package}}}")
 
+    def usepgfplotslibrary(self, package: str, **options) -> "TikzCode":
+        return self.__cmd(f"\\usepgfplotslibrary{format_options(**options)}{{{package}}}")
+
     def newcommand(self, command: str, definition, n_args: int = 0) -> "TikzCode":
         argcnt = f"[{n_args}]" if n_args > 0 else ""
         return self.__cmd(f"\\newcommand{{\\{command}}}{argcnt}{{{definition}}}")
