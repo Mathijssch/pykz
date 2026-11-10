@@ -36,6 +36,23 @@ Welcome to the example gallery for pykz.
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbcontainer" tooltip="Bar plots">
+
+.. only:: html
+
+  .. image:: /gallery/images/thumb/sphx_glr_barplots_thumb.png
+    :alt:
+
+  :doc:`/gallery/barplots`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Bar plots</div>
+    </div>
+
+
+.. raw:: html
+
     <div class="sphx-glr-thumbcontainer" tooltip="You can use keyword arguments to add options to your plots. These options generate pgfkeys options in the final output. Therefore, any string that can be interpreted by pdflatex is a valid value.">
 
 .. only:: html
@@ -65,6 +82,23 @@ Welcome to the example gallery for pykz.
 .. raw:: html
 
       <div class="sphx-glr-thumbnail-title">Directly using Tikz</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Histograms">
+
+.. only:: html
+
+  .. image:: /gallery/images/thumb/sphx_glr_histograms_thumb.png
+    :alt:
+
+  :doc:`/gallery/histograms`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Histograms</div>
     </div>
 
 
@@ -113,8 +147,10 @@ Welcome to the example gallery for pykz.
    :hidden:
 
    /gallery/basic_inline
+   /gallery/barplots
    /gallery/basic_customized
    /gallery/circles_and_squares
+   /gallery/histograms
    /gallery/low_level_tikz
    /gallery/contours
 
