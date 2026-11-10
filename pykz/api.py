@@ -782,6 +782,228 @@ def plot(
     return plot_commands
 
 
+def boxplot(
+    lower_whisker: float,
+    lower_quartile: float,
+    median: float,
+    upper_quartile: float,
+    upper_whisker: float,
+    *,
+    position: float = 1,
+    width: float = 0.5,
+    outliers=None,
+    orientation: str = "vertical",
+    ax: Axis | None = None,
+    label: str | None = None,
+    **options,
+) -> Addplot:
+    """Add a box plot from manually computed statistics.
+
+    Call repeatedly with different positions to compare datasets on one axis.
+    Fractional positions and smaller widths allow grouped comparisons.
+
+    Parameters
+    ----------
+    lower_whisker, upper_whisker : float
+        Outer ends of the whiskers.
+    lower_quartile, upper_quartile : float
+        Lower and upper edges of the box.
+    median : float
+        Position of the line inside the box. The five statistics must be
+        finite and ordered from the lower whisker to the upper whisker.
+    position : float, optional
+        Position on the categorical axis, by default 1.
+    width : float, optional
+        Positive box width in categorical-axis units, by default 0.5.
+    outliers : array-like, optional
+        One-dimensional sequence of finite outlier values.
+    orientation : {"vertical", "horizontal"}, optional
+        Direction of the values, by default "vertical". For horizontal boxes,
+        position and width refer to the y axis.
+    ax : Axis, optional
+        Target axis. Defaults to the current axis, creating one if needed.
+    label : str, optional
+        Legend entry. Omit for subsequent boxes of the same method in a group.
+    **options
+        PGFPlots styling options, such as ``fill``, ``draw``, and ``mark``.
+
+    Returns
+    -------
+    Addplot
+        The added command, whose options can be customized further.
+
+    Notes
+    -----
+    The PGFPlots statistics library is included automatically. No statistics
+    are computed from samples and outliers are supplied explicitly.
+    """
+    from .commands.boxplot import Boxplot
+    from .options import Options
+
+    statistics = np.asarray(
+        [lower_whisker, lower_quartile, median, upper_quartile, upper_whisker],
+        dtype=float,
+    )
+    if statistics.shape != (5,) or not np.all(np.isfinite(statistics)):
+        raise ValueError("Box plot statistics must be finite scalars.")
+    if np.any(np.diff(statistics) < 0):
+        raise ValueError("Box plot statistics must be in nondecreasing order.")
+    if not np.isfinite(position):
+        raise ValueError("position must be finite.")
+    if not np.isfinite(width) or width <= 0:
+        raise ValueError("width must be finite and positive.")
+    if orientation not in ("vertical", "horizontal"):
+        raise ValueError("orientation must be 'vertical' or 'horizontal'.")
+    outliers = np.asarray([] if outliers is None else outliers, dtype=float)
+    if outliers.ndim != 1 or not np.all(np.isfinite(outliers)):
+        raise ValueError("outliers must be a one-dimensional finite sequence.")
+
+    opts = Options(**options)
+    opts.set_option("boxplot prepared", Options(
+        lower_whisker=statistics[0], lower_quartile=statistics[1],
+        median=statistics[2], upper_quartile=statistics[3],
+        upper_whisker=statistics[4], draw_position=position,
+    ))
+    opts.set_option("boxplot/draw direction", "y" if orientation == "vertical" else "x")
+    opts.set_option("boxplot/box extend", width)
+    # Prepared boxes otherwise use their data-sized geometry in the legend.
+    if "legend image code/.code" not in opts:
+        opts.set_option("area legend", True)
+    if label is None and "forget plot" not in opts:
+        opts.set_option("forget plot", True)
+    command = Boxplot(outliers, label=label, **opts)
+    ax = ax if ax is not None else __get_or_create_ax()
+    requirement = r"\usepgfplotslibrary{statistics}"
+    if requirement not in ax.requirements.get_code().splitlines():
+        ax.add_requirement(requirement)
+    ax.add(command)
+    return command
+
+
+def grouped_boxplot(
+    experiments,
+    *,
+    experiment_labels=None,
+    method_labels=None,
+    method_options=None,
+    outliers=None,
+    group_width: float = 0.8,
+    orientation: str = "vertical",
+    ax: Axis | None = None,
+    **options,
+) -> list[list[Addplot]]:
+    """Compare methods across experiments using automatically grouped boxes.
+
+    Parameters
+    ----------
+    experiments : array-like, shape (n_experiments, n_methods, 5)
+        Precomputed summaries in the order ``(lower_whisker, lower_quartile,
+        median, upper_quartile, upper_whisker)``. Every experiment must contain
+        the same nonzero number of methods, in the same order.
+    experiment_labels : sequence of str, optional
+        One tick label per experiment. Defaults to numbers starting at 1.
+    method_labels : sequence of str, optional
+        One legend label per method. Each appears only once.
+    method_options : sequence of mappings, optional
+        Styling options for each method, overriding shared options. For example,
+        ``[{"fill": "cyan"}, {"fill": "red"}]``.
+    outliers : nested sequence, optional
+        Outlier sequences indexed by experiment and method. Each entry may be
+        None or an empty sequence when there are no outliers.
+    group_width : float, optional
+        Total group span in categorical-axis units, by default 0.8. Must be
+        greater than zero and at most 1. Methods occupy equally spaced slots;
+        each box fills 80 percent of its slot.
+    orientation : {"vertical", "horizontal"}, optional
+        Direction of the values, by default "vertical".
+    ax : Axis, optional
+        Target axis, defaulting to the current axis, creating one if needed.
+    **options
+        Shared PGFPlots styling options. Position, width, and legend inclusion
+        are managed by this function.
+
+    Returns
+    -------
+    list[list[Addplot]]
+        Commands indexed by experiment and method, available for customization.
+
+    Notes
+    -----
+    Groups are centered at 1, 2, ... . Categorical ticks are replaced on the
+    target axis (x for vertical boxes, y for horizontal boxes). All inputs are
+    validated before modifying the target axis.
+    """
+    from collections.abc import Mapping
+    from .options import Options
+
+    summaries = np.asarray(experiments, dtype=float)
+    if (summaries.ndim != 3 or summaries.shape[-1] != 5
+            or summaries.shape[0] == 0 or summaries.shape[1] == 0):
+        raise ValueError("experiments must have shape (n_experiments, n_methods, 5).")
+    n_experiments, n_methods, _ = summaries.shape
+    if not np.isscalar(group_width) or not np.isfinite(group_width) or not 0 < group_width <= 1:
+        raise ValueError("group_width must be finite, greater than zero, and at most 1.")
+
+    def labels(values, count, name):
+        if values is None:
+            return None
+        if isinstance(values, str):
+            raise ValueError(f"{name} must contain {count} strings.")
+        values = list(values)
+        if len(values) != count or not all(isinstance(value, str) for value in values):
+            raise ValueError(f"{name} must contain {count} strings.")
+        return values
+
+    experiment_labels = labels(experiment_labels, n_experiments, "experiment_labels")
+    if experiment_labels is None:
+        experiment_labels = [str(i) for i in range(1, n_experiments + 1)]
+    method_labels = labels(method_labels, n_methods, "method_labels")
+    styles = [{} for _ in range(n_methods)] if method_options is None else list(method_options)
+    if len(styles) != n_methods or not all(isinstance(style, Mapping) for style in styles):
+        raise ValueError("method_options must contain one mapping per method.")
+    if outliers is None:
+        outliers = [[None] * n_methods for _ in range(n_experiments)]
+    else:
+        outliers = [list(row) for row in outliers]
+        if len(outliers) != n_experiments or any(len(row) != n_methods for row in outliers):
+            raise ValueError("outliers must contain one sequence per experiment and method.")
+
+    # Build on a detached axis first so even a bad summary or outlier in the
+    # last experiment leaves the user's figure and workspace untouched.
+    staging = Axis()
+    slot = group_width / n_methods
+    commands = []
+    for i, experiment in enumerate(summaries):
+        row = []
+        for j, summary in enumerate(experiment):
+            style = dict(Options(**options))
+            style.update(Options(**styles[j]))
+            label = method_labels[j] if method_labels is not None and i == 0 else None
+            style["forget plot"] = label is None
+            row.append(boxplot(
+                *summary,
+                position=i + 1 + (j - (n_methods - 1) / 2) * slot,
+                width=0.8 * slot,
+                outliers=outliers[i][j], orientation=orientation,
+                label=label, ax=staging, **style,
+            ))
+        commands.append(row)
+
+    ax = ax if ax is not None else __get_or_create_ax()
+    for requirement in staging.requirements.get_code().splitlines():
+        if requirement not in ax.requirements.get_code().splitlines():
+            ax.add_requirement(requirement)
+    for row in commands:
+        for command in row:
+            ax.add(command)
+    ticks = np.arange(1, n_experiments + 1)
+    if orientation == "vertical":
+        ax.set_xticks(ticks, experiment_labels)
+    else:
+        ax.set_yticks(ticks, experiment_labels)
+    return commands
+
+
 def surf(
     x, y, z, ax: Axis | None = None, label: str | None = None, **options
 ) -> Addplot:
