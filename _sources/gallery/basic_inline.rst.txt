@@ -52,8 +52,8 @@ Minimal working example of `pykz`, plotting a simple sine function.
 
  .. code-block:: none
 
-    Removing basic_inline.log
     Removing basic_inline.aux
+    Removing basic_inline.log
 
     PosixPath('basic_inline.pdf')
 
@@ -80,7 +80,7 @@ This would be the equivalent to ``plt.show()``
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.441 seconds)
+   **Total running time of the script:** (0 minutes 0.649 seconds)
 
 
 .. _sphx_glr_download_gallery_basic_inline.py:

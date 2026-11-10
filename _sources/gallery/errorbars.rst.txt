@@ -63,8 +63,8 @@ API can also be passed through keyword arguments.
 
  .. code-block:: none
 
-    Removing errorbars_symmetric.log
     Removing errorbars_symmetric.aux
+    Removing errorbars_symmetric.log
 
     PosixPath('errorbars_symmetric.pdf')
 
@@ -108,8 +108,8 @@ Here the two methods use different conventions on the same axis, with consistent
 
  .. code-block:: none
 
-    Removing errorbars_comparison.log
     Removing errorbars_comparison.aux
+    Removing errorbars_comparison.log
 
     PosixPath('errorbars_comparison.pdf')
 
@@ -154,8 +154,8 @@ set_mark_options affects the end caps rather than the data-point markers.
 
  .. code-block:: none
 
-    Removing errorbars_mixed.log
     Removing errorbars_mixed.aux
+    Removing errorbars_mixed.log
 
     PosixPath('errorbars_mixed.pdf')
 
@@ -164,7 +164,7 @@ set_mark_options affects the end caps rather than the data-point markers.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 1.327 seconds)
+   **Total running time of the script:** (0 minutes 1.976 seconds)
 
 
 .. _sphx_glr_download_gallery_errorbars.py:

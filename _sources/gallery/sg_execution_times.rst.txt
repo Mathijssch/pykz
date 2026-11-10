@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:09.727** total execution time for 9 files **from gallery**:
+**00:15.373** total execution time for 9 files **from gallery**:
 
 .. container::
 
@@ -33,29 +33,29 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr_gallery_contours.py` (``contours.py``)
-     - 00:04.611
+     - 00:07.473
      - 0.0
    * - :ref:`sphx_glr_gallery_boxplots.py` (``boxplots.py``)
-     - 00:01.330
+     - 00:02.083
      - 0.0
    * - :ref:`sphx_glr_gallery_errorbars.py` (``errorbars.py``)
-     - 00:01.327
+     - 00:01.976
      - 0.0
    * - :ref:`sphx_glr_gallery_histograms.py` (``histograms.py``)
-     - 00:00.706
+     - 00:01.131
      - 0.0
    * - :ref:`sphx_glr_gallery_basic_customized.py` (``basic_customized.py``)
-     - 00:00.453
+     - 00:00.717
      - 0.0
    * - :ref:`sphx_glr_gallery_basic_inline.py` (``basic_inline.py``)
-     - 00:00.441
+     - 00:00.649
      - 0.0
    * - :ref:`sphx_glr_gallery_barplots.py` (``barplots.py``)
-     - 00:00.351
+     - 00:00.556
      - 0.0
    * - :ref:`sphx_glr_gallery_low_level_tikz.py` (``low_level_tikz.py``)
-     - 00:00.326
+     - 00:00.498
      - 0.0
    * - :ref:`sphx_glr_gallery_circles_and_squares.py` (``circles_and_squares.py``)
-     - 00:00.181
+     - 00:00.290
      - 0.0

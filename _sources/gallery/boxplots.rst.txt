@@ -57,8 +57,8 @@ are optional and supplied separately.
 
  .. code-block:: none
 
-    Removing boxplot_comparison.log
     Removing boxplot_comparison.aux
+    Removing boxplot_comparison.log
 
     PosixPath('boxplot_comparison.pdf')
 
@@ -107,8 +107,8 @@ upper whisker. Per-method styling stays consistent across experiments.
 
  .. code-block:: none
 
-    Removing boxplot_grouped.log
     Removing boxplot_grouped.aux
+    Removing boxplot_grouped.log
 
     PosixPath('boxplot_grouped.pdf')
 
@@ -145,8 +145,8 @@ so label the groups with yticks instead of xticks.
 
  .. code-block:: none
 
-    Removing boxplot_horizontal.log
     Removing boxplot_horizontal.aux
+    Removing boxplot_horizontal.log
 
     PosixPath('boxplot_horizontal.pdf')
 
@@ -155,7 +155,7 @@ so label the groups with yticks instead of xticks.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 1.330 seconds)
+   **Total running time of the script:** (0 minutes 2.083 seconds)
 
 
 .. _sphx_glr_download_gallery_boxplots.py:

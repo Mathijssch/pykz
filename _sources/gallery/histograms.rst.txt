@@ -95,8 +95,8 @@ By default, `pykz` will automatically determine the number of bins.
 
  .. code-block:: none
 
-    Removing histogram.log
     Removing histogram.aux
+    Removing histogram.log
 
     PosixPath('histogram.pdf')
 
@@ -131,8 +131,8 @@ We can also determine the number of bins manually
 
  .. code-block:: none
 
-    Removing histogram_manual.log
     Removing histogram_manual.aux
+    Removing histogram_manual.log
 
     PosixPath('histogram_manual.pdf')
 
@@ -141,7 +141,7 @@ We can also determine the number of bins manually
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.706 seconds)
+   **Total running time of the script:** (0 minutes 1.131 seconds)
 
 
 .. _sphx_glr_download_gallery_histograms.py:
