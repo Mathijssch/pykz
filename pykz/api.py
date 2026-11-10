@@ -877,6 +877,130 @@ def boxplot(
     return command
 
 
+def grouped_boxplot(
+    experiments,
+    *,
+    experiment_labels=None,
+    method_labels=None,
+    method_options=None,
+    outliers=None,
+    group_width: float = 0.8,
+    orientation: str = "vertical",
+    ax: Axis | None = None,
+    **options,
+) -> list[list[Addplot]]:
+    """Compare methods across experiments using automatically grouped boxes.
+
+    Parameters
+    ----------
+    experiments : array-like, shape (n_experiments, n_methods, 5)
+        Precomputed summaries in the order ``(lower_whisker, lower_quartile,
+        median, upper_quartile, upper_whisker)``. Every experiment must contain
+        the same nonzero number of methods, in the same order.
+    experiment_labels : sequence of str, optional
+        One tick label per experiment. Defaults to numbers starting at 1.
+    method_labels : sequence of str, optional
+        One legend label per method. Each appears only once.
+    method_options : sequence of mappings, optional
+        Styling options for each method, overriding shared options. For example,
+        ``[{"fill": "cyan"}, {"fill": "red"}]``.
+    outliers : nested sequence, optional
+        Outlier sequences indexed by experiment and method. Each entry may be
+        None or an empty sequence when there are no outliers.
+    group_width : float, optional
+        Total group span in categorical-axis units, by default 0.8. Must be
+        greater than zero and at most 1. Methods occupy equally spaced slots;
+        each box fills 80 percent of its slot.
+    orientation : {"vertical", "horizontal"}, optional
+        Direction of the values, by default "vertical".
+    ax : Axis, optional
+        Target axis, defaulting to the current axis, creating one if needed.
+    **options
+        Shared PGFPlots styling options. Position, width, and legend inclusion
+        are managed by this function.
+
+    Returns
+    -------
+    list[list[Addplot]]
+        Commands indexed by experiment and method, available for customization.
+
+    Notes
+    -----
+    Groups are centered at 1, 2, ... . Categorical ticks are replaced on the
+    target axis (x for vertical boxes, y for horizontal boxes). All inputs are
+    validated before modifying the target axis.
+    """
+    from collections.abc import Mapping
+    from .options import Options
+
+    summaries = np.asarray(experiments, dtype=float)
+    if (summaries.ndim != 3 or summaries.shape[-1] != 5
+            or summaries.shape[0] == 0 or summaries.shape[1] == 0):
+        raise ValueError("experiments must have shape (n_experiments, n_methods, 5).")
+    n_experiments, n_methods, _ = summaries.shape
+    if not np.isscalar(group_width) or not np.isfinite(group_width) or not 0 < group_width <= 1:
+        raise ValueError("group_width must be finite, greater than zero, and at most 1.")
+
+    def labels(values, count, name):
+        if values is None:
+            return None
+        if isinstance(values, str):
+            raise ValueError(f"{name} must contain {count} strings.")
+        values = list(values)
+        if len(values) != count or not all(isinstance(value, str) for value in values):
+            raise ValueError(f"{name} must contain {count} strings.")
+        return values
+
+    experiment_labels = labels(experiment_labels, n_experiments, "experiment_labels")
+    if experiment_labels is None:
+        experiment_labels = [str(i) for i in range(1, n_experiments + 1)]
+    method_labels = labels(method_labels, n_methods, "method_labels")
+    styles = [{} for _ in range(n_methods)] if method_options is None else list(method_options)
+    if len(styles) != n_methods or not all(isinstance(style, Mapping) for style in styles):
+        raise ValueError("method_options must contain one mapping per method.")
+    if outliers is None:
+        outliers = [[None] * n_methods for _ in range(n_experiments)]
+    else:
+        outliers = [list(row) for row in outliers]
+        if len(outliers) != n_experiments or any(len(row) != n_methods for row in outliers):
+            raise ValueError("outliers must contain one sequence per experiment and method.")
+
+    # Build on a detached axis first so even a bad summary or outlier in the
+    # last experiment leaves the user's figure and workspace untouched.
+    staging = Axis()
+    slot = group_width / n_methods
+    commands = []
+    for i, experiment in enumerate(summaries):
+        row = []
+        for j, summary in enumerate(experiment):
+            style = dict(Options(**options))
+            style.update(Options(**styles[j]))
+            label = method_labels[j] if method_labels is not None and i == 0 else None
+            style["forget plot"] = label is None
+            row.append(boxplot(
+                *summary,
+                position=i + 1 + (j - (n_methods - 1) / 2) * slot,
+                width=0.8 * slot,
+                outliers=outliers[i][j], orientation=orientation,
+                label=label, ax=staging, **style,
+            ))
+        commands.append(row)
+
+    ax = ax if ax is not None else __get_or_create_ax()
+    for requirement in staging.requirements.get_code().splitlines():
+        if requirement not in ax.requirements.get_code().splitlines():
+            ax.add_requirement(requirement)
+    for row in commands:
+        for command in row:
+            ax.add(command)
+    ticks = np.arange(1, n_experiments + 1)
+    if orientation == "vertical":
+        ax.set_xticks(ticks, experiment_labels)
+    else:
+        ax.set_yticks(ticks, experiment_labels)
+    return commands
+
+
 def surf(
     x, y, z, ax: Axis | None = None, label: str | None = None, **options
 ) -> Addplot:

@@ -21,11 +21,11 @@ pykz.save("boxplot_comparison.tex", standalone=True)
 pykz.io.export_pdf_from_file("boxplot_comparison.tex")
 
 # %%
-# For grouped comparisons, offset each method from the experiment's center
-# and choose a width smaller than the spacing between methods. Keep colors
-# consistent and label only the first box for each method to avoid duplicate
-# legend entries. These are precomputed statistics, ordered from lower whisker
-# through lower quartile, median, upper quartile, to upper whisker.
+# For grouped comparisons, grouped_boxplot computes positions and widths,
+# labels each experiment, and adds just one legend entry per method. Each
+# experiment contains one summary per method, in the same order. Summaries
+# run from lower whisker through lower quartile, median, upper quartile, to
+# upper whisker. Per-method styling stays consistent across experiments.
 method_a = [(8, 10, 12, 15, 20), (11, 14, 17, 19, 24), (16, 20, 23, 27, 32)]
 method_b = [(5, 7, 9, 11, 14), (8, 10, 12, 15, 19), (10, 13, 16, 20, 25)]
 
@@ -33,16 +33,14 @@ pykz.figure()
 axis = pykz.ax(
     ylabel="Execution time (ms)", legend_pos="north west", width="12cm"
 )
-for center, (stats_a, stats_b) in enumerate(zip(method_a, method_b), start=1):
-    pykz.boxplot(
-        *stats_a, position=center - 0.18, width=0.28,
-        fill="cyan", label="Method A" if center == 1 else None, ax=axis,
-    )
-    pykz.boxplot(
-        *stats_b, position=center + 0.18, width=0.28,
-        fill="red", label="Method B" if center == 1 else None, ax=axis,
-    )
-pykz.xticks([1, 2, 3], ["Experiment A", "Experiment B", "Experiment C"], ax=axis)
+experiments = list(zip(method_a, method_b))
+boxes = pykz.grouped_boxplot(
+    experiments,
+    experiment_labels=["Experiment A", "Experiment B", "Experiment C"],
+    method_labels=["Method A", "Method B"],
+    method_options=[{"fill": "cyan"}, {"fill": "red"}],
+    ax=axis,
+)
 pykz.save("boxplot_grouped.tex", standalone=True)
 pykz.io.export_pdf_from_file("boxplot_grouped.tex")
 
