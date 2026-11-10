@@ -121,6 +121,23 @@ Welcome to the example gallery for pykz.
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbcontainer" tooltip="Error bars: distances and endpoints">
+
+.. only:: html
+
+  .. image:: /gallery/images/thumb/sphx_glr_errorbars_thumb.png
+    :alt:
+
+  :doc:`/gallery/errorbars`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Error bars: distances and endpoints</div>
+    </div>
+
+
+.. raw:: html
+
     <div class="sphx-glr-thumbcontainer" tooltip="Countour plots">
 
 .. only:: html
@@ -169,6 +186,7 @@ Welcome to the example gallery for pykz.
    /gallery/circles_and_squares
    /gallery/histograms
    /gallery/low_level_tikz
+   /gallery/errorbars
    /gallery/contours
    /gallery/boxplots
 
