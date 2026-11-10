@@ -779,6 +779,104 @@ def plot(
     return plot_commands
 
 
+def boxplot(
+    lower_whisker: float,
+    lower_quartile: float,
+    median: float,
+    upper_quartile: float,
+    upper_whisker: float,
+    *,
+    position: float = 1,
+    width: float = 0.5,
+    outliers=None,
+    orientation: str = "vertical",
+    ax: Axis | None = None,
+    label: str | None = None,
+    **options,
+) -> Addplot:
+    """Add a box plot from manually computed statistics.
+
+    Call repeatedly with different positions to compare datasets on one axis.
+    Fractional positions and smaller widths allow grouped comparisons.
+
+    Parameters
+    ----------
+    lower_whisker, upper_whisker : float
+        Outer ends of the whiskers.
+    lower_quartile, upper_quartile : float
+        Lower and upper edges of the box.
+    median : float
+        Position of the line inside the box. The five statistics must be
+        finite and ordered from the lower whisker to the upper whisker.
+    position : float, optional
+        Position on the categorical axis, by default 1.
+    width : float, optional
+        Positive box width in categorical-axis units, by default 0.5.
+    outliers : array-like, optional
+        One-dimensional sequence of finite outlier values.
+    orientation : {"vertical", "horizontal"}, optional
+        Direction of the values, by default "vertical". For horizontal boxes,
+        position and width refer to the y axis.
+    ax : Axis, optional
+        Target axis. Defaults to the current axis, creating one if needed.
+    label : str, optional
+        Legend entry. Omit for subsequent boxes of the same method in a group.
+    **options
+        PGFPlots styling options, such as ``fill``, ``draw``, and ``mark``.
+
+    Returns
+    -------
+    Addplot
+        The added command, whose options can be customized further.
+
+    Notes
+    -----
+    The PGFPlots statistics library is included automatically. No statistics
+    are computed from samples and outliers are supplied explicitly.
+    """
+    from .commands.boxplot import Boxplot
+    from .options import Options
+
+    statistics = np.asarray(
+        [lower_whisker, lower_quartile, median, upper_quartile, upper_whisker],
+        dtype=float,
+    )
+    if statistics.shape != (5,) or not np.all(np.isfinite(statistics)):
+        raise ValueError("Box plot statistics must be finite scalars.")
+    if np.any(np.diff(statistics) < 0):
+        raise ValueError("Box plot statistics must be in nondecreasing order.")
+    if not np.isfinite(position):
+        raise ValueError("position must be finite.")
+    if not np.isfinite(width) or width <= 0:
+        raise ValueError("width must be finite and positive.")
+    if orientation not in ("vertical", "horizontal"):
+        raise ValueError("orientation must be 'vertical' or 'horizontal'.")
+    outliers = np.asarray([] if outliers is None else outliers, dtype=float)
+    if outliers.ndim != 1 or not np.all(np.isfinite(outliers)):
+        raise ValueError("outliers must be a one-dimensional finite sequence.")
+
+    opts = Options(**options)
+    opts.set_option("boxplot prepared", Options(
+        lower_whisker=statistics[0], lower_quartile=statistics[1],
+        median=statistics[2], upper_quartile=statistics[3],
+        upper_whisker=statistics[4], draw_position=position,
+    ))
+    opts.set_option("boxplot/draw direction", "y" if orientation == "vertical" else "x")
+    opts.set_option("boxplot/box extend", width)
+    # Prepared boxes otherwise use their data-sized geometry in the legend.
+    if "legend image code/.code" not in opts:
+        opts.set_option("area legend", True)
+    if label is None and "forget plot" not in opts:
+        opts.set_option("forget plot", True)
+    command = Boxplot(outliers, label=label, **opts)
+    ax = ax if ax is not None else __get_or_create_ax()
+    requirement = r"\usepgfplotslibrary{statistics}"
+    if requirement not in ax.requirements.get_code().splitlines():
+        ax.add_requirement(requirement)
+    ax.add(command)
+    return command
+
+
 def surf(
     x, y, z, ax: Axis | None = None, label: str | None = None, **options
 ) -> Addplot:
