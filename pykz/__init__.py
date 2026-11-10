@@ -42,6 +42,7 @@ from .api import (
     line,
     arrow,
     plot,
+    errorbar,
     boxplot,
     grouped_boxplot,
     scatter,
@@ -50,6 +51,7 @@ from .api import (
     colorbar,
 )
 from .environments.axis import Grid, Axis, AxisMode, AxisDir, View
+from .commands.errorbar import Errorbar
 from . import io
 
 __all__ = [
@@ -80,6 +82,8 @@ __all__ = [
     "line",
     "arrow",
     "plot",
+    "errorbar",
+    "Errorbar",
     "boxplot",
     "grouped_boxplot",
     "scatter",

@@ -6,12 +6,13 @@ from .tikzcode import TikzCode
 from .environments.axis import Axis
 from .environments.tikzpicture import TikzPicture
 from .commands.addplot import Addplot
+from .commands.errorbar import Errorbar
 from .commands.fillbetween import FillBetween
 from .commands.node import Node
 from .commands.draw import Draw
 from .commands.circle import Circle
 from .calc import Calc
-from .plot import create_plot, create_surface_plot
+from .plot import create_plot, create_surface_plot, create_errorbar
 from .contour import create_contour, create_contourf, ContourFilled, Contour
 import numpy as np
 from typing import Optional, Union
@@ -777,6 +778,77 @@ def plot(
     for plt in plot_commands:
         ax.add(plt)
     return plot_commands
+
+
+def errorbar(
+    x, y=None, *, xerr=None, yerr=None, xbounds=None, ybounds=None,
+    ax: Axis | None = None, label: str | None = None,
+    inline_label: bool = False, error_style=None, error_mark_options=None,
+    **options,
+) -> Errorbar:
+    """Plot a 2D series with error distances or absolute error-bar endpoints.
+
+    Parameters
+    ----------
+    x, y : array-like
+        Nonempty one-dimensional coordinates of equal length. If y is omitted,
+        x supplies the y values and x coordinates are indices starting at zero.
+    xerr, yerr : scalar or array-like, optional
+        Nonnegative, finite error distances. A scalar applies to every point;
+        a length-N sequence gives symmetric errors per point; shape (2, N)
+        specifies lower distances in the first row and upper distances in the
+        second row. Distances are measured in original data units.
+    xbounds, ybounds : pair of scalars or array-like, optional
+        Absolute (lower, upper) endpoints in original data coordinates, also
+        on logarithmic axes. Each endpoint is a scalar or length-N sequence.
+        Endpoints and the corresponding coordinates must be finite and satisfy
+        lower <= coordinate <= upper. Cannot be combined with the error-distance
+        argument for the same axis. Conventions may differ between axes.
+    ax : Axis, optional
+        Target axis. Defaults to the current axis, creating one if needed.
+    label : str, optional
+        Legend entry or inline label.
+    inline_label : bool, optional
+        Place the label along the plot instead of in the legend.
+    error_style : mapping or str, optional
+        Error-line styling, e.g. ``{"thick": True, "color": "red"}`` or
+        ``"thick"``. Overrides the fully qualified error-bar style option.
+    error_mark_options : mapping or str, optional
+        End-cap styling, e.g. ``{"rotate": 90, "mark_size": "3pt"}``.
+        Overrides the fully qualified error-mark options. Mapping keys accept
+        underscores in place of spaces. These are not data-point marker options.
+    **options
+        PGFPlots styling options, including mark and only_marks. Error bars
+        default to both directions. Use fully qualified keys such as
+        ``error bars/y dir`` or ``error bars/error bar style`` to customize them.
+
+    Returns
+    -------
+    Errorbar
+        The single command added to the axis. Use ``set_error_style`` and
+        ``set_mark_options`` to merge styling after creation; both return the
+        command for chaining. Changes appear in subsequent figure exports.
+
+    Notes
+    -----
+    Each call plots one series. With no errors or bounds, an ordinary plot is
+    produced. Input validation takes place before modifying the target axis.
+
+    Examples
+    --------
+    Equivalent distances and endpoints for two measurements:
+
+    >>> errorbar([1, 2], [10, 15], yerr=[[2, 3], [3, 2]])  # doctest: +SKIP
+    >>> errorbar([1, 2], [10, 15], ybounds=([8, 12], [13, 17]))  # doctest: +SKIP
+    """
+    command = create_errorbar(
+        x, y, xerr=xerr, yerr=yerr, xbounds=xbounds, ybounds=ybounds,
+        label=label, inline_label=inline_label, error_style=error_style,
+        error_mark_options=error_mark_options, **options,
+    )
+    ax = ax if ax is not None else __get_or_create_ax()
+    ax.add(command)
+    return command
 
 
 def boxplot(
