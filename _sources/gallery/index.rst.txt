@@ -136,6 +136,23 @@ Welcome to the example gallery for pykz.
     </div>
 
 
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Box plots and grouped comparisons">
+
+.. only:: html
+
+  .. image:: /gallery/images/thumb/sphx_glr_boxplots_thumb.png
+    :alt:
+
+  :doc:`/gallery/boxplots`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Box plots and grouped comparisons</div>
+    </div>
+
+
 .. thumbnail-parent-div-close
 
 .. raw:: html
@@ -153,6 +170,7 @@ Welcome to the example gallery for pykz.
    /gallery/histograms
    /gallery/low_level_tikz
    /gallery/contours
+   /gallery/boxplots
 
 
 .. only:: html

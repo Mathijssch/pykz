@@ -1203,6 +1203,234 @@
 
 
 
+<div class="viewcode-block" id="boxplot">
+<a class="viewcode-back" href="../../api.html#pykz.boxplot">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">boxplot</span><span class="p">(</span>
+    <span class="n">lower_whisker</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">lower_quartile</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">median</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">upper_quartile</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">upper_whisker</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">position</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">width</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span>
+    <span class="n">outliers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">orientation</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"vertical"</span><span class="p">,</span>
+    <span class="n">ax</span><span class="p">:</span> <span class="n">Axis</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">options</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Addplot</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Add a box plot from manually computed statistics.</span>
+
+<span class="sd">    Call repeatedly with different positions to compare datasets on one axis.</span>
+<span class="sd">    Fractional positions and smaller widths allow grouped comparisons.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    lower_whisker, upper_whisker : float</span>
+<span class="sd">        Outer ends of the whiskers.</span>
+<span class="sd">    lower_quartile, upper_quartile : float</span>
+<span class="sd">        Lower and upper edges of the box.</span>
+<span class="sd">    median : float</span>
+<span class="sd">        Position of the line inside the box. The five statistics must be</span>
+<span class="sd">        finite and ordered from the lower whisker to the upper whisker.</span>
+<span class="sd">    position : float, optional</span>
+<span class="sd">        Position on the categorical axis, by default 1.</span>
+<span class="sd">    width : float, optional</span>
+<span class="sd">        Positive box width in categorical-axis units, by default 0.5.</span>
+<span class="sd">    outliers : array-like, optional</span>
+<span class="sd">        One-dimensional sequence of finite outlier values.</span>
+<span class="sd">    orientation : {"vertical", "horizontal"}, optional</span>
+<span class="sd">        Direction of the values, by default "vertical". For horizontal boxes,</span>
+<span class="sd">        position and width refer to the y axis.</span>
+<span class="sd">    ax : Axis, optional</span>
+<span class="sd">        Target axis. Defaults to the current axis, creating one if needed.</span>
+<span class="sd">    label : str, optional</span>
+<span class="sd">        Legend entry. Omit for subsequent boxes of the same method in a group.</span>
+<span class="sd">    **options</span>
+<span class="sd">        PGFPlots styling options, such as ``fill``, ``draw``, and ``mark``.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Addplot</span>
+<span class="sd">        The added command, whose options can be customized further.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    The PGFPlots statistics library is included automatically. No statistics</span>
+<span class="sd">    are computed from samples and outliers are supplied explicitly.</span>
+<span class="sd">    """</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">.commands.boxplot</span><span class="w"> </span><span class="kn">import</span> <span class="n">Boxplot</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">.options</span><span class="w"> </span><span class="kn">import</span> <span class="n">Options</span>
+
+    <span class="n">statistics</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">lower_whisker</span><span class="p">,</span> <span class="n">lower_quartile</span><span class="p">,</span> <span class="n">median</span><span class="p">,</span> <span class="n">upper_quartile</span><span class="p">,</span> <span class="n">upper_whisker</span><span class="p">],</span>
+        <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">statistics</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="mi">5</span><span class="p">,)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">statistics</span><span class="p">)):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Box plot statistics must be finite scalars."</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">statistics</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Box plot statistics must be in nondecreasing order."</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">position</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"position must be finite."</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">width</span><span class="p">)</span> <span class="ow">or</span> <span class="n">width</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"width must be finite and positive."</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">orientation</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"vertical"</span><span class="p">,</span> <span class="s2">"horizontal"</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"orientation must be 'vertical' or 'horizontal'."</span><span class="p">)</span>
+    <span class="n">outliers</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([]</span> <span class="k">if</span> <span class="n">outliers</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">outliers</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">outliers</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">1</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">outliers</span><span class="p">)):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"outliers must be a one-dimensional finite sequence."</span><span class="p">)</span>
+
+    <span class="n">opts</span> <span class="o">=</span> <span class="n">Options</span><span class="p">(</span><span class="o">**</span><span class="n">options</span><span class="p">)</span>
+    <span class="n">opts</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s2">"boxplot prepared"</span><span class="p">,</span> <span class="n">Options</span><span class="p">(</span>
+        <span class="n">lower_whisker</span><span class="o">=</span><span class="n">statistics</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">lower_quartile</span><span class="o">=</span><span class="n">statistics</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+        <span class="n">median</span><span class="o">=</span><span class="n">statistics</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">upper_quartile</span><span class="o">=</span><span class="n">statistics</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span>
+        <span class="n">upper_whisker</span><span class="o">=</span><span class="n">statistics</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="n">draw_position</span><span class="o">=</span><span class="n">position</span><span class="p">,</span>
+    <span class="p">))</span>
+    <span class="n">opts</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s2">"boxplot/draw direction"</span><span class="p">,</span> <span class="s2">"y"</span> <span class="k">if</span> <span class="n">orientation</span> <span class="o">==</span> <span class="s2">"vertical"</span> <span class="k">else</span> <span class="s2">"x"</span><span class="p">)</span>
+    <span class="n">opts</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s2">"boxplot/box extend"</span><span class="p">,</span> <span class="n">width</span><span class="p">)</span>
+    <span class="c1"># Prepared boxes otherwise use their data-sized geometry in the legend.</span>
+    <span class="k">if</span> <span class="s2">"legend image code/.code"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">opts</span><span class="p">:</span>
+        <span class="n">opts</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s2">"area legend"</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">label</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="s2">"forget plot"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">opts</span><span class="p">:</span>
+        <span class="n">opts</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s2">"forget plot"</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+    <span class="n">command</span> <span class="o">=</span> <span class="n">Boxplot</span><span class="p">(</span><span class="n">outliers</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> <span class="o">**</span><span class="n">opts</span><span class="p">)</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">ax</span> <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">__get_or_create_ax</span><span class="p">()</span>
+    <span class="n">requirement</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">"\usepgfplotslibrary</span><span class="si">{statistics}</span><span class="s2">"</span>
+    <span class="k">if</span> <span class="n">requirement</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ax</span><span class="o">.</span><span class="n">requirements</span><span class="o">.</span><span class="n">get_code</span><span class="p">()</span><span class="o">.</span><span class="n">splitlines</span><span class="p">():</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">add_requirement</span><span class="p">(</span><span class="n">requirement</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">command</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">command</span></div>
+
+
+
+<div class="viewcode-block" id="grouped_boxplot">
+<a class="viewcode-back" href="../../api.html#pykz.grouped_boxplot">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">grouped_boxplot</span><span class="p">(</span>
+    <span class="n">experiments</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">experiment_labels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">method_labels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">method_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">outliers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">group_width</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.8</span><span class="p">,</span>
+    <span class="n">orientation</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"vertical"</span><span class="p">,</span>
+    <span class="n">ax</span><span class="p">:</span> <span class="n">Axis</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">options</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">Addplot</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">"""Compare methods across experiments using automatically grouped boxes.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    experiments : array-like, shape (n_experiments, n_methods, 5)</span>
+<span class="sd">        Precomputed summaries in the order ``(lower_whisker, lower_quartile,</span>
+<span class="sd">        median, upper_quartile, upper_whisker)``. Every experiment must contain</span>
+<span class="sd">        the same nonzero number of methods, in the same order.</span>
+<span class="sd">    experiment_labels : sequence of str, optional</span>
+<span class="sd">        One tick label per experiment. Defaults to numbers starting at 1.</span>
+<span class="sd">    method_labels : sequence of str, optional</span>
+<span class="sd">        One legend label per method. Each appears only once.</span>
+<span class="sd">    method_options : sequence of mappings, optional</span>
+<span class="sd">        Styling options for each method, overriding shared options. For example,</span>
+<span class="sd">        ``[{"fill": "cyan"}, {"fill": "red"}]``.</span>
+<span class="sd">    outliers : nested sequence, optional</span>
+<span class="sd">        Outlier sequences indexed by experiment and method. Each entry may be</span>
+<span class="sd">        None or an empty sequence when there are no outliers.</span>
+<span class="sd">    group_width : float, optional</span>
+<span class="sd">        Total group span in categorical-axis units, by default 0.8. Must be</span>
+<span class="sd">        greater than zero and at most 1. Methods occupy equally spaced slots;</span>
+<span class="sd">        each box fills 80 percent of its slot.</span>
+<span class="sd">    orientation : {"vertical", "horizontal"}, optional</span>
+<span class="sd">        Direction of the values, by default "vertical".</span>
+<span class="sd">    ax : Axis, optional</span>
+<span class="sd">        Target axis, defaulting to the current axis, creating one if needed.</span>
+<span class="sd">    **options</span>
+<span class="sd">        Shared PGFPlots styling options. Position, width, and legend inclusion</span>
+<span class="sd">        are managed by this function.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list[list[Addplot]]</span>
+<span class="sd">        Commands indexed by experiment and method, available for customization.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Groups are centered at 1, 2, ... . Categorical ticks are replaced on the</span>
+<span class="sd">    target axis (x for vertical boxes, y for horizontal boxes). All inputs are</span>
+<span class="sd">    validated before modifying the target axis.</span>
+<span class="sd">    """</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mapping</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">.options</span><span class="w"> </span><span class="kn">import</span> <span class="n">Options</span>
+
+    <span class="n">summaries</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">experiments</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">summaries</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">3</span> <span class="ow">or</span> <span class="n">summaries</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">5</span>
+            <span class="ow">or</span> <span class="n">summaries</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">summaries</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"experiments must have shape (n_experiments, n_methods, 5)."</span><span class="p">)</span>
+    <span class="n">n_experiments</span><span class="p">,</span> <span class="n">n_methods</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">summaries</span><span class="o">.</span><span class="n">shape</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isscalar</span><span class="p">(</span><span class="n">group_width</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">group_width</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="mi">0</span> <span class="o">&lt;</span> <span class="n">group_width</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"group_width must be finite, greater than zero, and at most 1."</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">labels</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">count</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">values</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> must contain </span><span class="si">{</span><span class="n">count</span><span class="si">}</span><span class="s2"> strings."</span><span class="p">)</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">)</span> <span class="o">!=</span> <span class="n">count</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">values</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> must contain </span><span class="si">{</span><span class="n">count</span><span class="si">}</span><span class="s2"> strings."</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">values</span>
+
+    <span class="n">experiment_labels</span> <span class="o">=</span> <span class="n">labels</span><span class="p">(</span><span class="n">experiment_labels</span><span class="p">,</span> <span class="n">n_experiments</span><span class="p">,</span> <span class="s2">"experiment_labels"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">experiment_labels</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">experiment_labels</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_experiments</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span>
+    <span class="n">method_labels</span> <span class="o">=</span> <span class="n">labels</span><span class="p">(</span><span class="n">method_labels</span><span class="p">,</span> <span class="n">n_methods</span><span class="p">,</span> <span class="s2">"method_labels"</span><span class="p">)</span>
+    <span class="n">styles</span> <span class="o">=</span> <span class="p">[{}</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_methods</span><span class="p">)]</span> <span class="k">if</span> <span class="n">method_options</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">list</span><span class="p">(</span><span class="n">method_options</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">styles</span><span class="p">)</span> <span class="o">!=</span> <span class="n">n_methods</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">style</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">)</span> <span class="k">for</span> <span class="n">style</span> <span class="ow">in</span> <span class="n">styles</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"method_options must contain one mapping per method."</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">outliers</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">outliers</span> <span class="o">=</span> <span class="p">[[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">n_methods</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_experiments</span><span class="p">)]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">outliers</span> <span class="o">=</span> <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">row</span><span class="p">)</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">outliers</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">outliers</span><span class="p">)</span> <span class="o">!=</span> <span class="n">n_experiments</span> <span class="ow">or</span> <span class="nb">any</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">row</span><span class="p">)</span> <span class="o">!=</span> <span class="n">n_methods</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">outliers</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"outliers must contain one sequence per experiment and method."</span><span class="p">)</span>
+
+    <span class="c1"># Build on a detached axis first so even a bad summary or outlier in the</span>
+    <span class="c1"># last experiment leaves the user's figure and workspace untouched.</span>
+    <span class="n">staging</span> <span class="o">=</span> <span class="n">Axis</span><span class="p">()</span>
+    <span class="n">slot</span> <span class="o">=</span> <span class="n">group_width</span> <span class="o">/</span> <span class="n">n_methods</span>
+    <span class="n">commands</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">experiment</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">summaries</span><span class="p">):</span>
+        <span class="n">row</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">summary</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">experiment</span><span class="p">):</span>
+            <span class="n">style</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">Options</span><span class="p">(</span><span class="o">**</span><span class="n">options</span><span class="p">))</span>
+            <span class="n">style</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">Options</span><span class="p">(</span><span class="o">**</span><span class="n">styles</span><span class="p">[</span><span class="n">j</span><span class="p">]))</span>
+            <span class="n">label</span> <span class="o">=</span> <span class="n">method_labels</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="k">if</span> <span class="n">method_labels</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="kc">None</span>
+            <span class="n">style</span><span class="p">[</span><span class="s2">"forget plot"</span><span class="p">]</span> <span class="o">=</span> <span class="n">label</span> <span class="ow">is</span> <span class="kc">None</span>
+            <span class="n">row</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">boxplot</span><span class="p">(</span>
+                <span class="o">*</span><span class="n">summary</span><span class="p">,</span>
+                <span class="n">position</span><span class="o">=</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">+</span> <span class="p">(</span><span class="n">j</span> <span class="o">-</span> <span class="p">(</span><span class="n">n_methods</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">slot</span><span class="p">,</span>
+                <span class="n">width</span><span class="o">=</span><span class="mf">0.8</span> <span class="o">*</span> <span class="n">slot</span><span class="p">,</span>
+                <span class="n">outliers</span><span class="o">=</span><span class="n">outliers</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">],</span> <span class="n">orientation</span><span class="o">=</span><span class="n">orientation</span><span class="p">,</span>
+                <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">staging</span><span class="p">,</span> <span class="o">**</span><span class="n">style</span><span class="p">,</span>
+            <span class="p">))</span>
+        <span class="n">commands</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">ax</span> <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">__get_or_create_ax</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">requirement</span> <span class="ow">in</span> <span class="n">staging</span><span class="o">.</span><span class="n">requirements</span><span class="o">.</span><span class="n">get_code</span><span class="p">()</span><span class="o">.</span><span class="n">splitlines</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">requirement</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ax</span><span class="o">.</span><span class="n">requirements</span><span class="o">.</span><span class="n">get_code</span><span class="p">()</span><span class="o">.</span><span class="n">splitlines</span><span class="p">():</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">add_requirement</span><span class="p">(</span><span class="n">requirement</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">commands</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">command</span> <span class="ow">in</span> <span class="n">row</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">command</span><span class="p">)</span>
+    <span class="n">ticks</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_experiments</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">orientation</span> <span class="o">==</span> <span class="s2">"vertical"</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="n">ticks</span><span class="p">,</span> <span class="n">experiment_labels</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">(</span><span class="n">ticks</span><span class="p">,</span> <span class="n">experiment_labels</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">commands</span></div>
+
+
+
 <span class="k">def</span><span class="w"> </span><span class="nf">surf</span><span class="p">(</span>
     <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">ax</span><span class="p">:</span> <span class="n">Axis</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Addplot</span><span class="p">:</span>
